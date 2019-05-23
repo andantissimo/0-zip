@@ -1,0 +1,12 @@
+[*.{rc,rc.h}]
+end_of_line = crlf
+
+[*.{vcxproj,vcxproj.filters}]
+end_of_line = crlf
+indent_size = 2
+indent_style = space
+
+[*.sln]
+end_of_line = crlf
+indent_size = 4
+indent_style = tab

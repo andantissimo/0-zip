@@ -1,0 +1,5 @@
+build
+msvc/.vs
+msvc/bin
+msvc/obj
+*.user

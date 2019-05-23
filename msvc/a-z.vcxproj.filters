@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\src\main.cc" />
+    <ClCompile Include="..\src\pdf2zip.cc" />
+    <ClCompile Include="..\src\pkzip_io.cc" />
+    <ClCompile Include="..\src\rar2zip.cc" />
+    <ClCompile Include="..\src\win32\trash.cc">
+      <Filter>win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\zip2zip.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\config.h" />
+    <ClInclude Include="..\src\dll.h" />
+    <ClInclude Include="..\src\handle.h" />
+    <ClInclude Include="..\src\options.h" />
+    <ClInclude Include="..\src\path_ops.h" />
+    <ClInclude Include="..\src\pdf2zip.h" />
+    <ClInclude Include="..\src\pkzip.h" />
+    <ClInclude Include="..\src\pkzip_io.h" />
+    <ClInclude Include="..\src\rar2zip.h" />
+    <ClInclude Include="..\src\strnatcmp.h" />
+    <ClInclude Include="..\src\trash.h" />
+    <ClInclude Include="..\src\zip2zip.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="win32">
+      <UniqueIdentifier>{f668ae68-14e3-4fc5-a5b1-5d20fdd76999}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
