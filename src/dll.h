@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef _WIN32
-#include <windows.h>
+#include "win32/dlfcn.h"
 #else
 #include <dlfcn.h>
 #endif
@@ -16,21 +16,6 @@ namespace az
     {
         dll(const dll &) = delete;
         dll & operator = (const dll &) = delete;
-#ifdef _WIN32
-    public:
-        explicit dll(const fs::path &path) noexcept
-            : _handle(&::FreeLibrary)
-        {
-            _handle = ::LoadLibraryW(path.c_str());
-        }
-    protected:
-        template <typename symbol_type>
-        auto symbol(const char *name) const noexcept
-        {
-            return reinterpret_cast<symbol_type>(::GetProcAddress(_handle, name));
-        }
-        unique_handle<HMODULE, decltype(&::FreeLibrary)> _handle;
-#else
     public:
         explicit dll(const fs::path &path) noexcept
             : _handle(&dlclose)
@@ -44,6 +29,5 @@ namespace az
             return reinterpret_cast<symbol_type>(dlsym(_handle, name));
         }
         unique_handle<void *, decltype(&dlclose)> _handle;
-#endif
     };
 }

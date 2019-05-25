@@ -1,10 +1,11 @@
 [*.{rc,rc.h}]
 end_of_line = crlf
 
-[*.{vcxproj,vcxproj.filters}]
+[*.vcxproj{,.filters}]
 end_of_line = crlf
 indent_size = 2
 indent_style = space
+insert_final_newline = false
 
 [*.sln]
 end_of_line = crlf
