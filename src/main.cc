@@ -12,7 +12,7 @@
 #include "rar2zip.h"
 #include "zip2zip.h"
 
-using namespace az;
+using namespace zz;
 using namespace std;
 namespace po = boost::program_options;
 
@@ -26,7 +26,7 @@ try
     using char_type   = remove_pointer_t<remove_pointer_t<decltype(argv)>>;
     using string_type = basic_string<char_type>;
 
-    const auto patterns = az::rar_exists()
+    const auto patterns = zz::rar_exists()
         ? "*.pdf|*.rar|*.zip"
         : "*.pdf|*.zip";
     po::options_description desc(

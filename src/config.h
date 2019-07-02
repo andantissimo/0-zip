@@ -2,7 +2,7 @@
 
 #if __has_include(<filesystem>)
 #include <filesystem>
-namespace az
+namespace zz
 {
     namespace fs = std::filesystem;
     namespace io = std;
@@ -10,7 +10,7 @@ namespace az
 }
 #elif __has_include(<experimental/filesystem>)
 #include <experimental/filesystem>
-namespace az
+namespace zz
 {
     namespace fs = std::experimental::filesystem;
     namespace io = std;
@@ -18,7 +18,7 @@ namespace az
 }
 #else
 #include <boost/filesystem.hpp>
-namespace az
+namespace zz
 {
     namespace fs = boost::filesystem;
     namespace io = boost::filesystem;

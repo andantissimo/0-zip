@@ -6,7 +6,7 @@
 
 #include "options.h"
 
-namespace az
+namespace zz
 {
     constexpr uint32_t pdf_signature = '%' | 'P' << 8 | 'D' << 16 | 'F' << 24;
 

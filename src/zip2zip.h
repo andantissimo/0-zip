@@ -6,7 +6,7 @@
 
 #include "options.h"
 
-namespace az
+namespace zz
 {
     constexpr uint32_t zip_signature = 'P' | 'K' << 8 | 3 << 16 | 4 << 24;
 

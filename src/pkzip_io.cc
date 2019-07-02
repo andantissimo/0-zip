@@ -31,9 +31,9 @@ static inline auto write(ostream &os, const value_type &value)
     write(os, &value, sizeof value);
 }
 
-string az::pkzip::charset = "cp932"; // TODO: resolve from OS environment
+string zz::pkzip::charset = "cp932"; // TODO: resolve from OS environment
 
-istream & az::pkzip::operator >> (istream &is, local_file_header &header)
+istream & zz::pkzip::operator >> (istream &is, local_file_header &header)
 {
     if (!read(is, header.signature) || !header)
         return is;
@@ -72,7 +72,7 @@ istream & az::pkzip::operator >> (istream &is, local_file_header &header)
     return is;
 }
 
-ostream & az::pkzip::operator << (ostream &os, const local_file_header &header)
+ostream & zz::pkzip::operator << (ostream &os, const local_file_header &header)
 {
     const auto file_name = (header.general_purpose_bit_flag & general_purpose_bit_flags::use_utf8)
         ? utf_to_utf<char>(header.file_name)
@@ -103,7 +103,7 @@ ostream & az::pkzip::operator << (ostream &os, const local_file_header &header)
     return os;
 }
 
-istream & az::pkzip::operator >> (istream &is, central_file_header &header)
+istream & zz::pkzip::operator >> (istream &is, central_file_header &header)
 {
     if (!read(is, header.signature) || !header)
         return is;
@@ -162,7 +162,7 @@ istream & az::pkzip::operator >> (istream &is, central_file_header &header)
     return is;
 }
 
-ostream & az::pkzip::operator << (ostream &os, const central_file_header &header)
+ostream & zz::pkzip::operator << (ostream &os, const central_file_header &header)
 {
     const auto file_name = (header.general_purpose_bit_flag & general_purpose_bit_flags::use_utf8)
         ? utf_to_utf<char>(header.file_name)
@@ -207,7 +207,7 @@ ostream & az::pkzip::operator << (ostream &os, const central_file_header &header
     return os;
 }
 
-istream & az::pkzip::operator >> (istream &is, end_of_central_directory_record &record)
+istream & zz::pkzip::operator >> (istream &is, end_of_central_directory_record &record)
 {
     if (!read(is, record.signature) || !record)
         return is;
@@ -234,7 +234,7 @@ istream & az::pkzip::operator >> (istream &is, end_of_central_directory_record &
     return is;
 }
 
-ostream & az::pkzip::operator << (ostream &os, const end_of_central_directory_record &record)
+ostream & zz::pkzip::operator << (ostream &os, const end_of_central_directory_record &record)
 {
     if (record.zip_file_comment.size() > numeric_limits<decltype(record.zip_file_comment_length)>::max())
         throw runtime_error("too long zip file comment: " + record.zip_file_comment);

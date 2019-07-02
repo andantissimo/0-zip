@@ -12,7 +12,7 @@
 
 #include "zip2zip.h"
 
-using namespace az;
+using namespace zz;
 using namespace std;
 
 template <typename size_type>
@@ -25,7 +25,7 @@ static inline auto & copy_n(ifstream &source, size_type count, ofstream &dest)
     return dest;
 }
 
-void az::zip2zip(const fs::path &path, const options &opts)
+void zz::zip2zip(const fs::path &path, const options &opts)
 {
     io::ifstream zip;
     zip.exceptions(ios::failbit | ios::badbit);

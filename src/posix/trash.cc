@@ -15,10 +15,10 @@ struct GError
 typedef void GFile;
 typedef void GCancellable;
 
-class libgio : public az::dll
+class libgio : public zz::dll
 {
 public:
-    explicit libgio(const az::fs::path &path) noexcept
+    explicit libgio(const zz::fs::path &path) noexcept
         : dll(path)
     {
         g_error_free        = symbol<decltype(g_error_free)>("g_error_free");
@@ -42,9 +42,9 @@ public:
 static inline auto gio_trash(const char *path, int &code) noexcept
 {
     if (libgio gio("libgio-2.0.so"); gio) {
-        az::unique_handle<GFile *, decltype(gio.g_object_unref)> gfile(gio.g_object_unref);
+        zz::unique_handle<GFile *, decltype(gio.g_object_unref)> gfile(gio.g_object_unref);
         gfile = gio.g_file_new_for_path(path);
-        az::unique_handle<GError *, decltype(gio.g_error_free)> gerror(gio.g_error_free);
+        zz::unique_handle<GError *, decltype(gio.g_error_free)> gerror(gio.g_error_free);
         if (gio.g_file_trash(gfile, nullptr, &gerror))
             return true;
         code = static_cast<GError *>(gerror)->code;
@@ -52,15 +52,15 @@ static inline auto gio_trash(const char *path, int &code) noexcept
     return false;
 }
 
-bool az::fs::trash(const az::fs::path &path)
+bool zz::fs::trash(const zz::fs::path &path)
 {
-    az::ec::error_code ec;
+    zz::ec::error_code ec;
     if (!trash(path, ec))
-        throw az::fs::filesystem_error("trash", path, ec);
+        throw zz::fs::filesystem_error("trash", path, ec);
     return true;
 }
 
-bool az::fs::trash(const az::fs::path &path, az::ec::error_code &ec) noexcept
+bool zz::fs::trash(const zz::fs::path &path, zz::ec::error_code &ec) noexcept
 {
     int code = 0;
     if (gio_trash(path.c_str(), code)) {
@@ -68,7 +68,7 @@ bool az::fs::trash(const az::fs::path &path, az::ec::error_code &ec) noexcept
         return true;
     }
     if (code != 0) {
-        ec.assign(code, az::ec::system_category());
+        ec.assign(code, zz::ec::system_category());
         return false;
     }
 

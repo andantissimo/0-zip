@@ -6,7 +6,7 @@
 
 #include "options.h"
 
-namespace az
+namespace zz
 {
     constexpr uint32_t rar_signature = 'R' | 'a' << 8 | 'r' << 16 | '!' << 24;
 

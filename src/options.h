@@ -1,6 +1,6 @@
 #pragma once
 
-namespace az
+namespace zz
 {
     struct options
     {

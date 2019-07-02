@@ -10,7 +10,7 @@
 
 #include "handle.h"
 
-namespace az
+namespace zz
 {
     class dll
     {

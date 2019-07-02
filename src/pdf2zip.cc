@@ -22,7 +22,7 @@
 
 #include "pdf2zip.h"
 
-using namespace az;
+using namespace zz;
 using namespace std;
 
 using boost::interprocess::ibufferstream;
@@ -46,7 +46,7 @@ static inline auto make_file_name(size_t object_num, const char *extension)
     return ss.str();
 }
 
-void az::pdf2zip(const fs::path &path, const options &opts)
+void zz::pdf2zip(const fs::path &path, const options &opts)
 {
     string pdf(fs::file_size(path), '\0');
     {

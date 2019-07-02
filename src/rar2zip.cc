@@ -21,7 +21,7 @@
 
 #include "rar2zip.h"
 
-using namespace az;
+using namespace zz;
 using namespace std;
 
 using crc32_t = boost::crc_32_type;
@@ -175,13 +175,13 @@ public:
     void   (PASCAL *RARSetCallback)(HANDLE, UNRARCALLBACK, intptr_t) = nullptr;
 };
 
-bool az::rar_exists()
+bool zz::rar_exists()
 {
     libunrar unrar;
     return !!unrar;
 }
 
-void az::rar2zip(const fs::path &path, const options &opts)
+void zz::rar2zip(const fs::path &path, const options &opts)
 {
     libunrar unrar;
     if (!unrar)

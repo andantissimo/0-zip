@@ -5,7 +5,7 @@
 
 #include "pkzip.h"
 
-namespace az::pkzip
+namespace zz::pkzip
 {
     extern std::string charset;
 

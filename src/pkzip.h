@@ -6,7 +6,7 @@
 
 #include "config.h"
 
-namespace az::pkzip
+namespace zz::pkzip
 {
     using char_type   = fs::path::value_type;
     using string_type = fs::path::string_type;

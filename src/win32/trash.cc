@@ -90,23 +90,23 @@ static inline auto Recycle(LPCWSTR pszPath)
     HR << op->PerformOperations();
 }
 
-bool az::fs::trash(const az::fs::path &path)
+bool zz::fs::trash(const zz::fs::path &path)
 {
-    az::ec::error_code ec;
+    zz::ec::error_code ec;
     if (!trash(path, ec))
-        throw az::fs::filesystem_error("trash", path, ec);
+        throw zz::fs::filesystem_error("trash", path, ec);
     return true;
 }
 
-bool az::fs::trash(const az::fs::path &path, az::ec::error_code &ec) noexcept
+bool zz::fs::trash(const zz::fs::path &path, zz::ec::error_code &ec) noexcept
 try
 {
-    Recycle(az::fs::absolute(path).c_str());
+    Recycle(zz::fs::absolute(path).c_str());
     ec.clear();
     return true;
 }
 catch (HRESULT hr)
 {
-    ec.assign(hr, az::ec::system_category());
+    ec.assign(hr, zz::ec::system_category());
     return false;
 }

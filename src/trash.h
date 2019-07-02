@@ -11,5 +11,5 @@ namespace boost::filesystem
 #endif
 {
     bool trash(const path &);
-    bool trash(const path &, az::ec::error_code &) noexcept;
+    bool trash(const path &, zz::ec::error_code &) noexcept;
 }
