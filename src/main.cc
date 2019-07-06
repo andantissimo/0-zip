@@ -35,7 +35,7 @@ try
         "Options");
     desc.add_options()
         ("help,h", "print this help")
-        ("quiet,q", "do net write anything to standard output");
+        ("quiet,q", "do not write anything to standard output");
 
     options opts;
     vector<string_type> args;
