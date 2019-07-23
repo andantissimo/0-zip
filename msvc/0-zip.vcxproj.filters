@@ -22,6 +22,7 @@
     <ClInclude Include="..\src\rar2zip.h" />
     <ClInclude Include="..\src\strnatcmp.h" />
     <ClInclude Include="..\src\trash.h" />
+    <ClInclude Include="..\src\version.h" />
     <ClInclude Include="..\src\win32\dlfcn.h">
       <Filter>win32</Filter>
     </ClInclude>

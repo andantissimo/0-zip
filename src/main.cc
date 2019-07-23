@@ -8,6 +8,7 @@
 #include "path_ops.h"
 
 #include "options.h"
+#include "version.h"
 #include "pdf2zip.h"
 #include "rar2zip.h"
 #include "zip2zip.h"
@@ -21,7 +22,9 @@ int wmain(int argc, wchar_t *argv[])
 #else
 int main(int argc, char *argv[])
 #endif
+#ifdef NDEBUG
 try
+#endif
 {
     using char_type   = remove_pointer_t<remove_pointer_t<decltype(argv)>>;
     using string_type = basic_string<char_type>;
@@ -35,7 +38,8 @@ try
         "Options");
     desc.add_options()
         ("help,h", "print this help")
-        ("quiet,q", "do not write anything to standard output");
+        ("quiet,q", "quiet (no output)")
+        ("version,v", "print the version");
 
     options opts;
     vector<string_type> args;
@@ -45,9 +49,13 @@ try
         po::store(parsed, vmap);
         po::notify(vmap);
         args = po::collect_unrecognized(parsed.options, po::include_positional);
+        if (vmap.count("version")) {
+            cerr << version << endl;
+            exit(0);
+        }
         if (vmap.count("help") || args.empty()) {
             cerr << desc << endl;
-            exit(2);
+            exit(0);
         }
         if (vmap.count("quiet"))
             opts.quiet = true;
@@ -86,8 +94,10 @@ try
 
     return 0;
 }
+#ifdef NDEBUG
 catch (const std::exception &ex)
 {
     cerr << "Error: " << ex.what() << endl;
     return 1;
 }
+#endif

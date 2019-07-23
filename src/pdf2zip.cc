@@ -48,6 +48,8 @@ static inline auto make_file_name(size_t object_num, const char *extension)
 
 void zz::pdf2zip(const fs::path &path, const options &opts)
 {
+    const auto filename = path.filename();
+
     string pdf(fs::file_size(path), '\0');
     {
         io::ifstream file;
@@ -55,11 +57,9 @@ void zz::pdf2zip(const fs::path &path, const options &opts)
         file.read(&pdf[0], pdf.size());
     }
 
-    const auto name = path.filename();
-
     auto eof = pdf.rfind("%%EOF");
     if (eof == string::npos)
-        throw runtime_error("%%EOF not found: " + name);
+        throw runtime_error("%%EOF not found: " + filename);
 
     struct object_t
     {
@@ -69,14 +69,14 @@ void zz::pdf2zip(const fs::path &path, const options &opts)
     {
         auto startxref = pdf.rfind("startxref", eof - 1);
         if (startxref == string::npos)
-            throw runtime_error("startxref not found: " + name);
+            throw runtime_error("startxref not found: " + filename);
         size_t xref = 0;
         ibufferstream(pdf.data() + startxref + 9, eof - startxref - 9) >> xref;
         if (xref == 0 || pdf.compare(xref, 4, "xref") != 0)
-            throw runtime_error("invalid startxref: " + name);
+            throw runtime_error("invalid startxref: " + filename);
         auto trailer = pdf.find("trailer", xref + 4);
         if (trailer == string::npos)
-            throw runtime_error("trailer not found: " + name);
+            throw runtime_error("trailer not found: " + filename);
         ibufferstream xrefs(pdf.data() + xref + 4, trailer - xref - 4);
         size_t number = 0, count = 0;
         xrefs >> number >> count;
@@ -89,7 +89,7 @@ void zz::pdf2zip(const fs::path &path, const options &opts)
             objects.push_back(object_t{ number + i, begin });
         }
         if (objects.empty())
-            throw runtime_error("no object found: " + name);
+            throw runtime_error("no object found: " + filename);
 
         sort(begin(objects), end(objects), [](const object_t &lhs, const object_t &rhs) {
             return lhs.begin < rhs.begin;
@@ -127,7 +127,7 @@ void zz::pdf2zip(const fs::path &path, const options &opts)
         if (meta.find("/DCTDecode") != string_view::npos) {
             const auto stream_view = object_view.substr(stream, endstream - stream);
             if (stream_view.size() > numeric_limits<decltype(pkzip::local_file_header::compressed_size)>::max())
-                throw runtime_error("large file not supported: " + name);
+                throw runtime_error("large file not supported: " + filename);
 
             pkzip::local_file_header header = { pkzip::local_file_header_signature };
             header.version_needed_to_extract = pkzip::version_needed_to_extract::default_value;
@@ -161,7 +161,7 @@ void zz::pdf2zip(const fs::path &path, const options &opts)
     for (const auto &entry : entries) {
         const streamoff offset = zip.tellp();
         if (offset > numeric_limits<decltype(pkzip::central_file_header::relative_offset_of_local_header)>::max())
-            throw runtime_error("large file not supported: " + name);
+            throw runtime_error("large file not supported: " + filename);
 
         pkzip::central_file_header record = { pkzip::central_file_header_signature };
         record.version_made_by                 = pkzip::version_made_by::msdos | entry.header.version_needed_to_extract;
@@ -189,7 +189,7 @@ void zz::pdf2zip(const fs::path &path, const options &opts)
         = decltype(pkzip::end_of_central_directory_record
             ::offset_of_start_of_central_directory_with_respect_to_the_starting_disk_number);
     if (directory_offset > numeric_limits<offset_of_directory_type>::max())
-        throw runtime_error("large file not supported: " + name);
+        throw runtime_error("large file not supported: " + filename);
     for (const auto &record : records)
         zip << record;
     const streamoff directory_size = zip.tellp() - directory_offset;

@@ -187,7 +187,7 @@ void zz::rar2zip(const fs::path &path, const options &opts)
     if (!unrar)
         throw runtime_error("libunrar not found");
 
-    const auto name = path.filename();
+    const auto filename = path.filename();
 
     unique_handle<HANDLE, decltype(unrar.RARCloseArchive)> hArchive(unrar.RARCloseArchive);
     {
@@ -200,7 +200,7 @@ void zz::rar2zip(const fs::path &path, const options &opts)
         rarOpenData.OpenMode = RAR_OM_EXTRACT;
         hArchive = unrar.RAROpenArchiveEx(&rarOpenData);
         if (rarOpenData.OpenResult != ERAR_SUCCESS)
-            throw runtime_error("failed to open: " + name);
+            throw runtime_error("failed to open: " + filename);
     }
 
     const auto zip_path = path.parent_path() / path.filename().replace_extension(".zip");
@@ -216,11 +216,11 @@ void zz::rar2zip(const fs::path &path, const options &opts)
         if (unrar.RARReadHeaderEx(hArchive, &rarHeaderData) != ERAR_SUCCESS)
             break;
         if (rarHeaderData.Flags & RHDF_ENCRYPTED)
-            throw runtime_error("encryption not supported: " + name);
+            throw runtime_error("encryption not supported: " + filename);
         if (rarHeaderData.Flags & RHDF_DIRECTORY)
             continue;
         if (rarHeaderData.UnpSizeHigh != 0)
-            throw runtime_error("large file not supported: " + name);
+            throw runtime_error("large file not supported: " + filename);
 
         pkzip::local_file_header header = { pkzip::local_file_header_signature };
         header.version_needed_to_extract = pkzip::version_needed_to_extract::default_value;
@@ -235,7 +235,7 @@ void zz::rar2zip(const fs::path &path, const options &opts)
 
         const streamoff offset = zip.tellp();
         if (offset > numeric_limits<decltype(pkzip::central_file_header::relative_offset_of_local_header)>::max())
-            throw runtime_error("large file not supported: " + name);
+            throw runtime_error("large file not supported: " + filename);
         zip << header;
 
         struct context_t
@@ -262,7 +262,7 @@ void zz::rar2zip(const fs::path &path, const options &opts)
             return -1;
         }, reinterpret_cast<intptr_t>(&context));
         if (unrar.RARProcessFileW(hArchive, RAR_TEST, nullptr, nullptr) != ERAR_SUCCESS)
-            throw runtime_error("failed to read: " + name);
+            throw runtime_error("failed to read: " + filename);
 
         header.crc32 = context.crc32();
         const auto next_offset = zip.tellp();
@@ -282,7 +282,7 @@ void zz::rar2zip(const fs::path &path, const options &opts)
         record.file_name                       = header.file_name;
         records.push_back(record);
         if (records.size() > numeric_limits<decltype(pkzip::end_of_central_directory_record::total_number_of_entries_in_the_central_directory)>::max())
-            throw runtime_error("too many entries: " + name);
+            throw runtime_error("too many entries: " + filename);
     }
     if (!opts.quiet)
         cout << endl;
@@ -294,7 +294,7 @@ void zz::rar2zip(const fs::path &path, const options &opts)
         = decltype(pkzip::end_of_central_directory_record
             ::offset_of_start_of_central_directory_with_respect_to_the_starting_disk_number);
     if (directory_offset > numeric_limits<offset_of_directory_type>::max())
-        throw runtime_error("large file not supported: " + name);
+        throw runtime_error("large file not supported: " + filename);
     for (const auto &record : records)
         zip << record;
     const streamoff directory_size = zip.tellp() - directory_offset;

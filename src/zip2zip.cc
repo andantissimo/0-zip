@@ -27,11 +27,12 @@ static inline auto & copy_n(ifstream &source, size_type count, ofstream &dest)
 
 void zz::zip2zip(const fs::path &path, const options &opts)
 {
+    const auto filename = path.filename();
+    const auto filesize = fs::file_size(path);
+
     io::ifstream zip;
     zip.exceptions(ios::failbit | ios::badbit);
     zip.open(path, ios::binary);
-
-    const auto name = path.filename();
 
     struct entry_t
     {
@@ -41,14 +42,17 @@ void zz::zip2zip(const fs::path &path, const options &opts)
     vector<entry_t> entries;
     for (pkzip::local_file_header header; zip >> header && header; zip.seekg(entries.back().offset + header.compressed_size)) {
         if (header.general_purpose_bit_flag & pkzip::general_purpose_bit_flags::file_is_encrypted)
-            throw runtime_error("encryption not supported: " + name);
+            throw runtime_error("encryption not supported: " + filename);
         if (header.general_purpose_bit_flag & pkzip::general_purpose_bit_flags::has_data_descriptor)
-            throw runtime_error("data descriptor not supported: " + name);
-        entries.push_back(entry_t{ header, zip.tellg() });
+            throw runtime_error("data descriptor not supported: " + filename);
+        const streamoff offset = zip.tellg();
+        if (static_cast<decltype(filesize)>(offset + header.compressed_size) > filesize)
+            break;
+        entries.push_back(entry_t{ header, offset });
         using total_number_of_entries_type
             = decltype(pkzip::end_of_central_directory_record::total_number_of_entries_in_the_central_directory);
         if (entries.size() > numeric_limits<total_number_of_entries_type>::max())
-            throw runtime_error("too many entries: " + name);
+            throw runtime_error("too many entries: " + filename);
 
         if (!opts.quiet)
             cout << "\r   " << dec << setw(3) << setfill('0') << entries.size() << " entries read";
@@ -73,7 +77,7 @@ void zz::zip2zip(const fs::path &path, const options &opts)
     for (const auto &entry : entries) {
         const streamoff offset = tmp.tellp();
         if (offset > numeric_limits<decltype(pkzip::central_file_header::relative_offset_of_local_header)>::max())
-            throw runtime_error("large file not supported: " + name);
+            throw runtime_error("large file not supported: " + filename);
 
         pkzip::central_file_header record = { pkzip::central_file_header_signature };
         record.version_made_by                 = pkzip::version_made_by::msdos | entry.header.version_needed_to_extract;
@@ -107,7 +111,7 @@ void zz::zip2zip(const fs::path &path, const options &opts)
         = decltype(pkzip::end_of_central_directory_record
             ::offset_of_start_of_central_directory_with_respect_to_the_starting_disk_number);
     if (directory_offset > numeric_limits<offset_of_directory_type>::max())
-        throw runtime_error("large file not supported: " + name);
+        throw runtime_error("large file not supported: " + filename);
     for (const auto &record : records)
         tmp << record;
     const streamoff directory_size = tmp.tellp() - directory_offset;
