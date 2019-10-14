@@ -1,6 +1,6 @@
 #pragma once
 
-#if __has_include(<filesystem>)
+#if __has_include(<filesystem>) && !__APPLE__
 #include <filesystem>
 namespace zz
 {
@@ -8,7 +8,7 @@ namespace zz
     namespace io = std;
     namespace ec = std;
 }
-#elif __has_include(<experimental/filesystem>)
+#elif __has_include(<experimental/filesystem>) && !__APPLE__
 #include <experimental/filesystem>
 namespace zz
 {
