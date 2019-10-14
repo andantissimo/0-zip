@@ -19,6 +19,10 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3 --coverage" CACHE STRING "" FORCE)
 endif()
 
+if(APPLE AND EXISTS /usr/local/lib/cmake/Boost-1.71.0/BoostConfig.cmake)
+	set(Boost_NO_BOOST_CMAKE ON)
+endif()
+
 check_include_file_cxx("filesystem"              HAVE_FILESYSTEM)
 check_include_file_cxx("experimental/filesystem" HAVE_EXPERIMENTAL_FILESYSTEM)
 if(HAVE_FILESYSTEM OR HAVE_EXPERIMENTAL_FILESYSTEM)
