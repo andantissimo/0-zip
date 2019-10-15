@@ -16,20 +16,20 @@ namespace zz::pkzip
 
     struct local_file_header
     {
-        uint32_t signature;
-        uint16_t version_needed_to_extract;
-        uint16_t general_purpose_bit_flag;
-        uint16_t compression_method;
-        uint16_t last_mod_file_time;
-        uint16_t last_mod_file_date;
-        uint32_t crc32;
-        uint32_t compressed_size;
-        uint32_t uncompressed_size;
-        uint16_t file_name_length;
-        uint16_t extra_field_length;
+        uint32_t signature                 = 0;
+        uint16_t version_needed_to_extract = 0;
+        uint16_t general_purpose_bit_flag  = 0;
+        uint16_t compression_method        = 0;
+        uint16_t last_mod_file_time        = 0;
+        uint16_t last_mod_file_date        = 0;
+        uint32_t crc32                     = 0;
+        uint32_t compressed_size           = 0;
+        uint32_t uncompressed_size         = 0;
+        uint16_t file_name_length          = 0;
+        uint16_t extra_field_length        = 0;
 
-        string_type file_name;
-        binary_type extra_field;
+        string_type file_name   = {};
+        binary_type extra_field = {};
 
         explicit operator bool () const noexcept
         {
@@ -45,27 +45,27 @@ namespace zz::pkzip
 
     struct central_file_header
     {
-        uint32_t signature;
-        uint16_t version_made_by;
-        uint16_t version_needed_to_extract;
-        uint16_t general_purpose_bit_flag;
-        uint16_t compression_method;
-        uint16_t last_mod_file_time;
-        uint16_t last_mod_file_date;
-        uint32_t crc32;
-        uint32_t compressed_size;
-        uint32_t uncompressed_size;
-        uint16_t file_name_length;
-        uint16_t extra_field_length;
-        uint16_t file_comment_length;
-        uint16_t disk_number_start;
-        uint16_t internal_file_attributes;
-        uint32_t external_file_attributes;
-        uint32_t relative_offset_of_local_header;
+        uint32_t signature                       = 0;
+        uint16_t version_made_by                 = 0;
+        uint16_t version_needed_to_extract       = 0;
+        uint16_t general_purpose_bit_flag        = 0;
+        uint16_t compression_method              = 0;
+        uint16_t last_mod_file_time              = 0;
+        uint16_t last_mod_file_date              = 0;
+        uint32_t crc32                           = 0;
+        uint32_t compressed_size                 = 0;
+        uint32_t uncompressed_size               = 0;
+        uint16_t file_name_length                = 0;
+        uint16_t extra_field_length              = 0;
+        uint16_t file_comment_length             = 0;
+        uint16_t disk_number_start               = 0;
+        uint16_t internal_file_attributes        = 0;
+        uint32_t external_file_attributes        = 0;
+        uint32_t relative_offset_of_local_header = 0;
 
-        string_type file_name;
-        binary_type extra_field;
-        string_type file_comment;
+        string_type file_name    = {};
+        binary_type extra_field  = {};
+        string_type file_comment = {};
 
         explicit operator bool() const noexcept
         {
@@ -81,16 +81,16 @@ namespace zz::pkzip
 
     struct end_of_central_directory_record
     {
-        uint32_t signature;
-        uint16_t number_of_this_disk;
-        uint16_t number_of_the_disk_with_the_start_of_the_central_directory;
-        uint16_t total_number_of_entries_in_the_central_directory_on_this_disk;
-        uint16_t total_number_of_entries_in_the_central_directory;
-        uint32_t size_of_the_central_directory;
-        uint32_t offset_of_start_of_central_directory_with_respect_to_the_starting_disk_number;
-        uint16_t zip_file_comment_length;
+        uint32_t signature                                                                     = 0;
+        uint16_t number_of_this_disk                                                           = 0;
+        uint16_t number_of_the_disk_with_the_start_of_the_central_directory                    = 0;
+        uint16_t total_number_of_entries_in_the_central_directory_on_this_disk                 = 0;
+        uint16_t total_number_of_entries_in_the_central_directory                              = 0;
+        uint32_t size_of_the_central_directory                                                 = 0;
+        uint32_t offset_of_start_of_central_directory_with_respect_to_the_starting_disk_number = 0;
+        uint16_t zip_file_comment_length                                                       = 0;
 
-        std::string zip_file_comment;
+        std::string zip_file_comment = {};
 
         explicit operator bool() const noexcept
         {

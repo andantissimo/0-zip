@@ -13,7 +13,7 @@ namespace zz
             handle_type,
             close_type,
             null_value
-        > this_type;
+            > this_type;
         unique_handle() = delete;
         unique_handle(const this_type &) = delete;
         this_type & operator = (const this_type &) = delete;

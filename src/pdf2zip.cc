@@ -8,14 +8,13 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable: 4244)
-#pragma warning(disable: 4245)
+#pragma warning(disable: 4244 4245)
 #endif
 #include <boost/crc.hpp>
+#include <boost/interprocess/streams/bufferstream.hpp>
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#include <boost/interprocess/streams/bufferstream.hpp>
 
 #include "path_ops.h"
 #include "pkzip_io.h"

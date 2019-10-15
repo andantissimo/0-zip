@@ -1,5 +1,12 @@
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 #include <boost/locale/encoding.hpp>
 #include <boost/locale/util.hpp>
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 #include "pkzip_io.h"
 
