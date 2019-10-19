@@ -2,5 +2,5 @@
 
 namespace zz
 {
-    constexpr auto version = "0.0.1";
+    constexpr auto version = "0.0.2";
 }
