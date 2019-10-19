@@ -136,7 +136,7 @@ void zz::zip2zip(const fs::path &path, const options &opts)
 
     fs::trash(path);
     if (!opts.quiet)
-        cout << "   moved to trash" << endl;
+        cout << "   trashed" << endl;
 
     fs::rename(tmp_path, path);
     if (!opts.quiet)

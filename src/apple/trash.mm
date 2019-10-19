@@ -21,10 +21,16 @@ bool zz::fs::trash(const zz::fs::path &path)
 bool zz::fs::trash(const zz::fs::path &path, zz::ec::error_code &ec) noexcept
 {
     NSError *error = nil;
-    auto succeeded = NSTrash(path.c_str(), &error);
-    if (succeeded)
+    if (NSTrash(path.c_str(), &error)) {
         ec.clear();
-    else
+        return true;
+    }
+    if (error.code != NSFeatureUnsupportedError) {
         ec.assign(error.code, zz::ec::system_category());
-    return succeeded;
+        return false;
+    }
+
+    auto backup_filename = path.filename().string() + "~";
+    rename(path, path.parent_path() / backup_filename, ec);
+    return !ec;
 }
