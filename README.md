@@ -24,11 +24,13 @@ converts and/or extracts data in *.pdf, *.rar or *.zip to a noncompressed zip ar
 </table>
 
 ## Runtime Dependencies
+
 * [UnRAR](https://www.rarlab.com/rar_add.htm) (Optional)
 
 ## Build Instructions
 
-### Windows Development
+### Windows Requirements
+
 * Visual Studio 2019+
   * Windows Universal CRT
 * VCpkg
@@ -37,21 +39,24 @@ converts and/or extracts data in *.pdf, *.rar or *.zip to a noncompressed zip ar
   * boost-locale:x64-windows-static
   * boost-program-options:x64-windows-static
 
-### Build and Installation
+### How to Build for Windows
+
 1. open `msvc/0-zip.sln`
 2. build `Release|x64`
 3. copy `msvc/bin/x64/Release/0z.exe` to wherever you want
 
-### Generic Development
-* CMake 3.1+
+### Generic Requirements
+
+* CMake 3.8+
 * Clang 6.0+ or GCC 7.0+ or Xcode 10.0+
 * Boost 1.66+ (boost-locale, boost-program-options)
 
-### Build and Installation
+### How to Build for Generic
+
 ```sh
-$ mkdir build
-$ cd build
-$ cmake -DCMAKE_BUILD_TYPE=Release ..
-$ make
-$ sudo make install
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make
+sudo make install
 ```
