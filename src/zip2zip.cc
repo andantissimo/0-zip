@@ -16,7 +16,7 @@ using namespace zz;
 using namespace std;
 
 template <typename size_type>
-static inline auto & copy_n(ifstream &source, size_type count, ofstream &dest)
+static inline auto & copy_n(io::ifstream &source, size_type count, io::ofstream &dest)
 {
     constexpr size_type buffer_size = 8192;
     char buffer[buffer_size];

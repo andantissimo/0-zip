@@ -10,14 +10,6 @@ static inline BOOL NSTrash(const char *path, NSError **error) noexcept
                                                     error:error];
 }
 
-bool zz::fs::trash(const zz::fs::path &path)
-{
-    zz::ec::error_code ec;
-    if (!trash(path, ec))
-        throw zz::fs::filesystem_error("trash", path, ec);
-    return true;
-}
-
 bool zz::fs::trash(const zz::fs::path &path, zz::ec::error_code &ec) noexcept
 {
     NSError *error = nil;

@@ -2,14 +2,14 @@
 
 #include "config.h"
 
-#if __has_include(<filesystem>) && !__APPLE__
-namespace std::filesystem
-#elif __has_include(<experimental/filesystem>) && !__APPLE__
-namespace std::experimental::filesystem
-#else
-namespace boost::filesystem
-#endif
+namespace zz::fs
 {
-    bool trash(const path &);
-    bool trash(const path &, zz::ec::error_code &) noexcept;
+    extern bool trash(const zz::fs::path &, zz::ec::error_code &) noexcept;
+    inline bool trash(const zz::fs::path &path)
+    {
+        zz::ec::error_code ec;
+        if (!trash(path, ec))
+            throw zz::fs::filesystem_error("trash", path, ec);
+        return true;
+    }
 }

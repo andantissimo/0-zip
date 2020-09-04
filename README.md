@@ -45,13 +45,13 @@ converts and/or extracts data in *.pdf, *.rar or *.zip to a noncompressed zip ar
 2. build `Release|x64`
 3. copy `msvc/bin/x64/Release/0z.exe` to wherever you want
 
-### Generic Requirements
+### POSIX Requirements
 
 * CMake 3.8+
-* Clang 6.0+ or GCC 7.0+ or Xcode 10.0+
+* Clang 6.0+ or GCC 7.0+ or Xcode 11.1+
 * Boost 1.66+ (boost-locale, boost-program-options)
 
-### How to Build for Generic
+### How to Build for POSIX
 
 ```sh
 mkdir build

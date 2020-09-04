@@ -52,14 +52,6 @@ static inline auto gio_trash(const char *path, int &code) noexcept
     return false;
 }
 
-bool zz::fs::trash(const zz::fs::path &path)
-{
-    zz::ec::error_code ec;
-    if (!trash(path, ec))
-        throw zz::fs::filesystem_error("trash", path, ec);
-    return true;
-}
-
 bool zz::fs::trash(const zz::fs::path &path, zz::ec::error_code &ec) noexcept
 {
     int code = 0;

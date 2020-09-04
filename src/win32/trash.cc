@@ -90,14 +90,6 @@ static inline auto Recycle(LPCWSTR pszPath)
     HR << op->PerformOperations();
 }
 
-bool zz::fs::trash(const zz::fs::path &path)
-{
-    zz::ec::error_code ec;
-    if (!trash(path, ec))
-        throw zz::fs::filesystem_error("trash", path, ec);
-    return true;
-}
-
 bool zz::fs::trash(const zz::fs::path &path, zz::ec::error_code &ec) noexcept
 try
 {
