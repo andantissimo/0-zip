@@ -36,8 +36,10 @@ converts and/or extracts data in *.pdf, *.rar or *.zip to a noncompressed zip ar
 * VCpkg
   * boost-crc:x64-windows-static
   * boost-interprocess:x64-windows-static
+  * boost-iostreams:x64-windows-static
   * boost-locale:x64-windows-static
   * boost-program-options:x64-windows-static
+  * zlib:x64-windows-static
 
 ### How to Build for Windows
 
@@ -49,7 +51,11 @@ converts and/or extracts data in *.pdf, *.rar or *.zip to a noncompressed zip ar
 
 * CMake 3.8+
 * Clang 6.0+ or GCC 7.0+ or Xcode 11.1+
-* Boost 1.66+ (boost-locale, boost-program-options)
+* Boost 1.66+
+  * boost-iostreams
+  * boost-locale
+  * boost-program-options)
+* zlib
 
 ### How to Build for POSIX
 

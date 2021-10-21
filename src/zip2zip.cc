@@ -5,6 +5,17 @@
 #include <sstream>
 #include <stdexcept>
 
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4706)
+#endif
+#include <boost/iostreams/filter/zlib.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
 #include "path_ops.h"
 #include "pkzip_io.h"
 #include "strnatcmp.h"
@@ -14,6 +25,10 @@
 
 using namespace zz;
 using namespace std;
+
+using boost::iostreams::filtering_istream;
+using boost::iostreams::zlib_decompressor;
+using boost::iostreams::zlib_params;
 
 template <typename size_type>
 static inline auto & copy_n(io::ifstream &source, size_type count, io::ofstream &dest)
@@ -74,7 +89,7 @@ void zz::zip2zip(const fs::path &path, const options &opts)
     const auto tmp_name = tmp_path.filename();
 
     vector<pkzip::central_file_header> records;
-    for (const auto &entry : entries) {
+    for (auto &entry : entries) {
         const streamoff offset = tmp.tellp();
         if (offset > numeric_limits<decltype(pkzip::central_file_header::relative_offset_of_local_header)>::max())
             throw runtime_error("large file not supported: " + filename);
@@ -92,11 +107,26 @@ void zz::zip2zip(const fs::path &path, const options &opts)
         record.relative_offset_of_local_header = static_cast<decltype(record.relative_offset_of_local_header)>(offset);
         record.file_name                       = entry.header.file_name;
         record.extra_field                     = entry.header.extra_field;
-        records.push_back(record);
 
-        tmp << entry.header;
         zip.seekg(entry.offset);
-        copy_n(zip, entry.header.compressed_size, tmp);
+        if (entry.header.compression_method == pkzip::compression_method::deflated) {
+            vector<char> buf(entry.header.uncompressed_size);
+            zlib_params z;
+            z.noheader = true;
+            filtering_istream dec;
+            dec.push(zlib_decompressor(z));
+            dec.push(zip);
+            dec.read(data(buf), size(buf));
+            entry.header.compression_method = pkzip::compression_method::stored;
+            entry.header.compressed_size    = entry.header.uncompressed_size;
+            tmp << entry.header;
+            tmp.write(data(buf), size(buf));
+        } else {
+            tmp << entry.header;
+            copy_n(zip, entry.header.compressed_size, tmp);
+        }
+
+        records.push_back(record);
 
         if (!opts.quiet)
             cout << "\r   " << dec << setw(3) << setfill('0') << records.size() << " entries written";
