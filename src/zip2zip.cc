@@ -117,8 +117,8 @@ void zz::zip2zip(const fs::path &path, const options &opts)
             dec.push(zlib_decompressor(z));
             dec.push(zip);
             dec.read(data(buf), size(buf));
-            entry.header.compression_method = pkzip::compression_method::stored;
-            entry.header.compressed_size    = entry.header.uncompressed_size;
+            record.compression_method = entry.header.compression_method = pkzip::compression_method::stored;
+            record.compressed_size    = entry.header.compressed_size    = entry.header.uncompressed_size;
             tmp << entry.header;
             tmp.write(data(buf), size(buf));
         } else {
