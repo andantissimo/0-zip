@@ -44,7 +44,8 @@ else()
 endif()
 
 if(HAVE_FILESYSTEM OR HAVE_EXPERIMENTAL_FILESYSTEM)
-	if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT APPLE)
+	if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT APPLE
+		AND CMAKE_CXX_COMPILER_VERSION LESS "9.0")
 		target_link_libraries(0z c++fs)
 	elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 		target_link_libraries(0z stdc++fs)
