@@ -41,7 +41,7 @@ public:
 
 static inline auto gio_trash(const char *path, int &code) noexcept
 {
-    if (libgio gio("libgio-2.0.so"); gio) {
+    if (libgio gio("libgio-2.0.so.0"); gio) {
         zz::unique_handle<GFile *, decltype(gio.g_object_unref)> gfile(gio.g_object_unref);
         gfile = gio.g_file_new_for_path(path);
         zz::unique_handle<GError *, decltype(gio.g_error_free)> gerror(gio.g_error_free);
