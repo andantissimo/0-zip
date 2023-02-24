@@ -96,7 +96,7 @@ void zz::zip2zip(const fs::path &path, const options &opts)
             throw runtime_error("large file not supported: " + filename);
 
         pkzip::central_file_header record(opts.charset.second);
-        record.version_made_by                 = pkzip::version_made_by::msdos | entry.header.version_needed_to_extract;
+        record.version_made_by                 = entry.header.version_needed_to_extract | pkzip::version_made_by::msdos;
         record.version_needed_to_extract       = entry.header.version_needed_to_extract;
         record.general_purpose_bit_flag        = entry.header.general_purpose_bit_flag;
         record.compression_method              = entry.header.compression_method;

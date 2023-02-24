@@ -12,14 +12,39 @@ namespace zz::pkzip
     using string_type = fs::path::string_type;
     using binary_type = std::vector<uint8_t>;
 
+    namespace version_made_by
+    {
+        constexpr uint16_t msdos =  0 << 8; // FAT, FAT32
+        constexpr uint16_t unix  =  3 << 8;
+        constexpr uint16_t ntfs  = 10 << 8;
+    }
+
+    namespace version_needed_to_extract
+    {
+        constexpr uint16_t default_value = 10;
+    }
+
+    namespace general_purpose_bit_flags
+    {
+        constexpr uint16_t file_is_encrypted   = 1 <<  0;
+        constexpr uint16_t has_data_descriptor = 1 <<  3;
+        constexpr uint16_t use_utf8            = 1 << 11;
+    }
+
+    namespace compression_method
+    {
+        constexpr uint16_t stored   = 0;
+        constexpr uint16_t deflated = 8;
+    }
+
     constexpr uint32_t local_file_header_signature = 'P' | 'K' << 8 | 3 << 16 | 4 << 24;
 
     struct local_file_header
     {
         uint32_t signature                 = local_file_header_signature;
-        uint16_t version_needed_to_extract = 0;
+        uint16_t version_needed_to_extract = version_needed_to_extract::default_value;
         uint16_t general_purpose_bit_flag  = 0;
-        uint16_t compression_method        = 0;
+        uint16_t compression_method        = compression_method::stored;
         uint16_t last_mod_file_time        = 0;
         uint16_t last_mod_file_date        = 0;
         uint32_t crc32                     = 0;
@@ -52,10 +77,10 @@ namespace zz::pkzip
     struct central_file_header
     {
         uint32_t signature                       = central_file_header_signature;
-        uint16_t version_made_by                 = 0;
-        uint16_t version_needed_to_extract       = 0;
+        uint16_t version_made_by                 = version_needed_to_extract::default_value | version_made_by::msdos;
+        uint16_t version_needed_to_extract       = version_needed_to_extract::default_value;
         uint16_t general_purpose_bit_flag        = 0;
-        uint16_t compression_method              = 0;
+        uint16_t compression_method              = compression_method::stored;
         uint16_t last_mod_file_time              = 0;
         uint16_t last_mod_file_date              = 0;
         uint32_t crc32                           = 0;
@@ -113,31 +138,4 @@ namespace zz::pkzip
             return signature != end_of_central_directory_record_signature;
         }
     };
-
-    namespace version_made_by
-    {
-        constexpr uint16_t msdos   =  0 << 8; // FAT, FAT32
-        constexpr uint16_t unix    =  3 << 8;
-        constexpr uint16_t windows = 10 << 8; // NTFS
-        constexpr uint16_t osx     = 19 << 8;
-    }
-
-    namespace version_needed_to_extract
-    {
-        constexpr uint16_t default_value           = 10;
-        constexpr uint16_t use_deflate_compression = 20;
-    }
-
-    namespace general_purpose_bit_flags
-    {
-        constexpr uint16_t file_is_encrypted   = 1 <<  0;
-        constexpr uint16_t has_data_descriptor = 1 <<  3;
-        constexpr uint16_t use_utf8            = 1 << 11;
-    }
-
-    namespace compression_method
-    {
-        constexpr uint16_t stored   = 0;
-        constexpr uint16_t deflated = 8;
-    }
 }

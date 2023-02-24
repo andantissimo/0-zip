@@ -129,11 +129,10 @@ void zz::pdf2zip(const fs::path &path, const options &opts)
                 throw runtime_error("large file not supported: " + filename);
 
             pkzip::local_file_header header(opts.charset.second);
-            header.version_needed_to_extract = pkzip::version_needed_to_extract::default_value;
-            header.crc32                     = compute_crc32(stream_view.data(), stream_view.size());
-            header.compressed_size           = static_cast<decltype(header.compressed_size)>(stream_view.size());
-            header.uncompressed_size         = static_cast<decltype(header.uncompressed_size)>(stream_view.size());
-            header.file_name                 = make_file_name(1 + entries.size(), ".jpg");
+            header.crc32             = compute_crc32(stream_view.data(), stream_view.size());
+            header.compressed_size   = static_cast<decltype(header.compressed_size)>(stream_view.size());
+            header.uncompressed_size = static_cast<decltype(header.uncompressed_size)>(stream_view.size());
+            header.file_name         = make_file_name(1 + entries.size(), ".jpg");
             entries.push_back({ header, stream_view });
 
             if (!opts.quiet)
@@ -163,7 +162,7 @@ void zz::pdf2zip(const fs::path &path, const options &opts)
             throw runtime_error("large file not supported: " + filename);
 
         pkzip::central_file_header record(opts.charset.second);
-        record.version_made_by                 = pkzip::version_made_by::msdos | entry.header.version_needed_to_extract;
+        record.version_made_by                 = entry.header.version_needed_to_extract | pkzip::version_made_by::msdos;
         record.version_needed_to_extract       = entry.header.version_needed_to_extract;
         record.crc32                           = entry.header.crc32;
         record.compressed_size                 = entry.header.compressed_size;
