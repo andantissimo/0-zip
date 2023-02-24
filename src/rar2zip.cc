@@ -191,7 +191,7 @@ void zz::rar2zip(const fs::path &path, const options &opts)
     unique_handle<HANDLE, decltype(unrar.RARCloseArchive)> hArchive(unrar.RARCloseArchive);
     {
         RAROpenArchiveDataEx rarOpenData = {};
-#ifdef _WIN32
+#ifdef _UNICODE
         rarOpenData.ArcNameW = const_cast<wchar_t *>(path.c_str());
 #else
         rarOpenData.ArcName  = const_cast<char *>(path.c_str());
@@ -225,7 +225,7 @@ void zz::rar2zip(const fs::path &path, const options &opts)
         header.version_needed_to_extract = pkzip::version_needed_to_extract::default_value;
         header.compressed_size           = rarHeaderData.UnpSize;
         header.uncompressed_size         = rarHeaderData.UnpSize;
-#ifdef _WIN32
+#ifdef _UNICODE
         header.file_name                 = rarHeaderData.FileNameW;
 #else
         header.file_name                 = rarHeaderData.FileName;
