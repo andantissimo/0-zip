@@ -54,7 +54,7 @@ converts and/or extracts data in *.pdf, *.rar or *.zip to a noncompressed zip ar
 * Boost 1.66+
   * boost-iostreams
   * boost-locale
-  * boost-program-options)
+  * boost-program-options
 * zlib
 
 ### How to Build for POSIX
