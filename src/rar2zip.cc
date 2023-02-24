@@ -221,7 +221,7 @@ void zz::rar2zip(const fs::path &path, const options &opts)
         if (rarHeaderData.UnpSizeHigh != 0)
             throw runtime_error("large file not supported: " + filename);
 
-        pkzip::local_file_header header(opts.charset);
+        pkzip::local_file_header header(opts.charset.second);
         header.version_needed_to_extract = pkzip::version_needed_to_extract::default_value;
         header.compressed_size           = rarHeaderData.UnpSize;
         header.uncompressed_size         = rarHeaderData.UnpSize;
@@ -271,7 +271,7 @@ void zz::rar2zip(const fs::path &path, const options &opts)
         if (!opts.quiet)
             cout << "\r   " << dec << setw(3) << setfill('0') << records.size() << " entries written";
 
-        pkzip::central_file_header record(opts.charset);
+        pkzip::central_file_header record(opts.charset.second);
         record.version_made_by                 = pkzip::version_made_by::msdos | header.version_needed_to_extract;
         record.version_needed_to_extract       = header.version_needed_to_extract;
         record.crc32                           = header.crc32;

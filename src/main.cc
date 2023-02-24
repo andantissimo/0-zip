@@ -17,6 +17,23 @@ using namespace zz;
 using namespace std;
 namespace po = boost::program_options;
 
+namespace std
+{
+    static inline auto & operator >> (istream &in, pair<string, string> &value)
+    {
+        string s;
+        in >> s;
+        const auto i = s.find(',');
+        value.first  = i == string::npos ? s : s.substr(0, i);
+        value.second = i == string::npos ? s : s.substr(i + 1);
+        return in;
+    }
+    static inline auto & operator << (ostream &out, const pair<string, string> &value)
+    {
+        return out << value.first << ',' << value.second;
+    }
+}
+
 #ifdef _UNICODE
 int wmain(int argc, wchar_t *argv[])
 #else
@@ -41,8 +58,8 @@ try
         ("help,h", "print this help")
         ("quiet,q", "quiet mode")
         ("version,v", "print the version")
-        ("charset,O", po::value(&opts.charset)->value_name("CHARSET")->default_value("cp932"),
-            "specify a character encoding");
+        ("charset,O", po::value(&opts.charset)->value_name("IN,OUT")->default_value(opts.charset),
+            "specify character encodings");
     vector<string_type> args;
     try {
         auto parsed = po::parse_command_line(argc, argv, desc);

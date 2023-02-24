@@ -8,6 +8,8 @@
 #pragma GCC diagnostic pop
 #endif
 
+#include "strnatcmp.h"
+
 #include "pkzip_io.h"
 
 using namespace std;
@@ -16,6 +18,14 @@ using boost::locale::conv::from_utf;
 using boost::locale::conv::to_utf;
 using boost::locale::conv::utf_to_utf;
 using boost::locale::util::get_system_locale;
+
+static const string utf8_charsets[] = { "CP65001", "UTF-8", "UTF8" };
+
+static inline auto is_utf8(const string &charset)
+{
+    auto pred = [&charset](const string &s) { return strnatcasecmp(s, charset) == 0; };
+    return find_if(begin(utf8_charsets), end(utf8_charsets), pred) != end(utf8_charsets);
+}
 
 static inline auto read(istream &is, void *data, size_t size)
 {
@@ -68,7 +78,10 @@ istream & zz::pkzip::operator >> (istream &is, local_file_header &header)
 
 ostream & zz::pkzip::operator << (ostream &os, const local_file_header &header)
 {
-    const auto use_utf8 = header.general_purpose_bit_flag & general_purpose_bit_flags::use_utf8;
+    auto general_purpose_bit_flag = header.general_purpose_bit_flag;
+    if ((general_purpose_bit_flag & general_purpose_bit_flags::use_utf8) == 0 && is_utf8(header.charset))
+        general_purpose_bit_flag |= general_purpose_bit_flags::use_utf8;
+    const auto use_utf8 = general_purpose_bit_flag & general_purpose_bit_flags::use_utf8;
     const auto file_name = use_utf8 ? utf_to_utf<char>(header.file_name) : from_utf(header.file_name, header.charset);
     if (file_name.size() > numeric_limits<decltype(header.file_name_length)>::max())
         throw runtime_error("too long file name: " + file_name);
@@ -77,7 +90,7 @@ ostream & zz::pkzip::operator << (ostream &os, const local_file_header &header)
 
     write(os, header.signature);
     write(os, header.version_needed_to_extract);
-    write(os, header.general_purpose_bit_flag);
+    write(os, general_purpose_bit_flag);
     write(os, header.compression_method);
     write(os, header.last_mod_file_time);
     write(os, header.last_mod_file_date);
@@ -134,7 +147,10 @@ istream & zz::pkzip::operator >> (istream &is, central_file_header &header)
 
 ostream & zz::pkzip::operator << (ostream &os, const central_file_header &header)
 {
-    const auto use_utf8 = header.general_purpose_bit_flag & general_purpose_bit_flags::use_utf8;
+    auto general_purpose_bit_flag = header.general_purpose_bit_flag;
+    if ((general_purpose_bit_flag & general_purpose_bit_flags::use_utf8) == 0 && is_utf8(header.charset))
+        general_purpose_bit_flag |= general_purpose_bit_flags::use_utf8;
+    const auto use_utf8 = general_purpose_bit_flag & general_purpose_bit_flags::use_utf8;
     const auto file_name = use_utf8 ? utf_to_utf<char>(header.file_name) : from_utf(header.file_name, header.charset);
     if (file_name.size() > numeric_limits<decltype(header.file_name_length)>::max())
         throw runtime_error("too long file name: " + file_name);
@@ -147,7 +163,7 @@ ostream & zz::pkzip::operator << (ostream &os, const central_file_header &header
     write(os, header.signature);
     write(os, header.version_made_by);
     write(os, header.version_needed_to_extract);
-    write(os, header.general_purpose_bit_flag);
+    write(os, general_purpose_bit_flag);
     write(os, header.compression_method);
     write(os, header.last_mod_file_time);
     write(os, header.last_mod_file_date);
