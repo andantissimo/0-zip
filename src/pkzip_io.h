@@ -7,8 +7,6 @@
 
 namespace zz::pkzip
 {
-    extern std::string charset;
-
     std::istream & operator >> (std::istream &, local_file_header &);
     std::ostream & operator << (std::ostream &, const local_file_header &);
 

@@ -4,6 +4,7 @@ namespace zz
 {
     struct options
     {
-        bool quiet = false;
+        bool        quiet   = false;
+        std::string charset = "cp932";
     };
 }

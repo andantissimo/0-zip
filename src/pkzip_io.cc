@@ -38,8 +38,6 @@ static inline auto write(ostream &os, const value_type &value)
     write(os, &value, sizeof value);
 }
 
-string zz::pkzip::charset = "cp932"; // TODO: resolve from OS environment
-
 istream & zz::pkzip::operator >> (istream &is, local_file_header &header)
 {
     if (!read(is, header.signature) || !header ||
@@ -59,7 +57,7 @@ istream & zz::pkzip::operator >> (istream &is, local_file_header &header)
     if (!read(is, &file_name[0], header.file_name_length))
         return is;
     const auto use_utf8 = header.general_purpose_bit_flag & general_purpose_bit_flags::use_utf8;
-    header.file_name = use_utf8 ? utf_to_utf<char_type>(file_name) : to_utf<char_type>(file_name, charset);
+    header.file_name = use_utf8 ? utf_to_utf<char_type>(file_name) : to_utf<char_type>(file_name, header.charset);
     if (header.extra_field_length) {
         header.extra_field.resize(header.extra_field_length);
         if (!read(is, &header.extra_field[0], header.extra_field_length))
@@ -71,7 +69,7 @@ istream & zz::pkzip::operator >> (istream &is, local_file_header &header)
 ostream & zz::pkzip::operator << (ostream &os, const local_file_header &header)
 {
     const auto use_utf8 = header.general_purpose_bit_flag & general_purpose_bit_flags::use_utf8;
-    const auto file_name = use_utf8 ? utf_to_utf<char>(header.file_name) : from_utf(header.file_name, charset);
+    const auto file_name = use_utf8 ? utf_to_utf<char>(header.file_name) : from_utf(header.file_name, header.charset);
     if (file_name.size() > numeric_limits<decltype(header.file_name_length)>::max())
         throw runtime_error("too long file name: " + file_name);
     if (header.extra_field.size() > numeric_limits<decltype(header.extra_field_length)>::max())
@@ -119,7 +117,7 @@ istream & zz::pkzip::operator >> (istream &is, central_file_header &header)
     if (!is.read(&file_name[0], header.file_name_length))
         return is;
     const auto use_utf8 = header.general_purpose_bit_flag & general_purpose_bit_flags::use_utf8;
-    header.file_name = use_utf8 ? utf_to_utf<char_type>(file_name) : to_utf<char_type>(file_name, charset);
+    header.file_name = use_utf8 ? utf_to_utf<char_type>(file_name) : to_utf<char_type>(file_name, header.charset);
     if (header.extra_field_length) {
         header.extra_field.resize(header.extra_field_length);
         if (!read(is, &header.extra_field[0], header.extra_field_length))
@@ -129,7 +127,7 @@ istream & zz::pkzip::operator >> (istream &is, central_file_header &header)
         string file_comment(header.file_comment_length, '\0');
         if (!is.read(&file_comment[0], header.file_comment_length))
             return is;
-        header.file_comment = use_utf8 ? utf_to_utf<char_type>(file_comment) : to_utf<char_type>(file_comment, charset);
+        header.file_comment = use_utf8 ? utf_to_utf<char_type>(file_comment) : to_utf<char_type>(file_comment, header.charset);
     }
     return is;
 }
@@ -137,12 +135,12 @@ istream & zz::pkzip::operator >> (istream &is, central_file_header &header)
 ostream & zz::pkzip::operator << (ostream &os, const central_file_header &header)
 {
     const auto use_utf8 = header.general_purpose_bit_flag & general_purpose_bit_flags::use_utf8;
-    const auto file_name = use_utf8 ? utf_to_utf<char>(header.file_name) : from_utf(header.file_name, charset);
+    const auto file_name = use_utf8 ? utf_to_utf<char>(header.file_name) : from_utf(header.file_name, header.charset);
     if (file_name.size() > numeric_limits<decltype(header.file_name_length)>::max())
         throw runtime_error("too long file name: " + file_name);
     if (header.extra_field.size() > numeric_limits<decltype(header.extra_field_length)>::max())
         throw runtime_error("too long extra field: " + file_name);
-    const auto file_comment = use_utf8 ? utf_to_utf<char>(header.file_comment) : from_utf(header.file_comment, charset);
+    const auto file_comment = use_utf8 ? utf_to_utf<char>(header.file_comment) : from_utf(header.file_comment, header.charset);
     if (file_comment.size() > numeric_limits<decltype(header.file_comment_length)>::max())
         throw runtime_error("too long file comment: " + file_comment);
 

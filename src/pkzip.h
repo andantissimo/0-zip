@@ -16,7 +16,7 @@ namespace zz::pkzip
 
     struct local_file_header
     {
-        uint32_t signature                 = 0;
+        uint32_t signature                 = local_file_header_signature;
         uint16_t version_needed_to_extract = 0;
         uint16_t general_purpose_bit_flag  = 0;
         uint16_t compression_method        = 0;
@@ -28,9 +28,15 @@ namespace zz::pkzip
         uint16_t file_name_length          = 0;
         uint16_t extra_field_length        = 0;
 
+        std::string charset;
+
         string_type file_name   = {};
         binary_type extra_field = {};
 
+        explicit local_file_header(const std::string &charset)
+            : charset(charset)
+        {
+        }
         explicit operator bool () const noexcept
         {
             return signature == local_file_header_signature;
@@ -45,7 +51,7 @@ namespace zz::pkzip
 
     struct central_file_header
     {
-        uint32_t signature                       = 0;
+        uint32_t signature                       = central_file_header_signature;
         uint16_t version_made_by                 = 0;
         uint16_t version_needed_to_extract       = 0;
         uint16_t general_purpose_bit_flag        = 0;
@@ -63,10 +69,16 @@ namespace zz::pkzip
         uint32_t external_file_attributes        = 0;
         uint32_t relative_offset_of_local_header = 0;
 
+        std::string charset;
+
         string_type file_name    = {};
         binary_type extra_field  = {};
         string_type file_comment = {};
 
+        explicit central_file_header(const std::string &charset)
+            : charset(charset)
+        {
+        }
         explicit operator bool() const noexcept
         {
             return signature == central_file_header_signature;
@@ -81,7 +93,7 @@ namespace zz::pkzip
 
     struct end_of_central_directory_record
     {
-        uint32_t signature                                                                     = 0;
+        uint32_t signature                                                                     = end_of_central_directory_record_signature;
         uint16_t number_of_this_disk                                                           = 0;
         uint16_t number_of_the_disk_with_the_start_of_the_central_directory                    = 0;
         uint16_t total_number_of_entries_in_the_central_directory_on_this_disk                 = 0;

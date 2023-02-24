@@ -55,7 +55,7 @@ void zz::zip2zip(const fs::path &path, const options &opts)
         streamoff                offset;
     };
     vector<entry_t> entries;
-    for (pkzip::local_file_header header; zip >> header && header; zip.seekg(entries.back().offset + header.compressed_size)) {
+    for (pkzip::local_file_header header(opts.charset); zip >> header && header; zip.seekg(entries.back().offset + header.compressed_size)) {
         if (header.general_purpose_bit_flag & pkzip::general_purpose_bit_flags::file_is_encrypted)
             throw runtime_error("encryption not supported: " + filename);
         if (header.general_purpose_bit_flag & pkzip::general_purpose_bit_flags::has_data_descriptor)
@@ -94,7 +94,7 @@ void zz::zip2zip(const fs::path &path, const options &opts)
         if (offset > numeric_limits<decltype(pkzip::central_file_header::relative_offset_of_local_header)>::max())
             throw runtime_error("large file not supported: " + filename);
 
-        pkzip::central_file_header record = { pkzip::central_file_header_signature };
+        pkzip::central_file_header record(opts.charset);
         record.version_made_by                 = pkzip::version_made_by::msdos | entry.header.version_needed_to_extract;
         record.version_needed_to_extract       = entry.header.version_needed_to_extract;
         record.general_purpose_bit_flag        = entry.header.general_purpose_bit_flag;
@@ -146,7 +146,7 @@ void zz::zip2zip(const fs::path &path, const options &opts)
         tmp << record;
     const streamoff directory_size = tmp.tellp() - directory_offset;
 
-    pkzip::end_of_central_directory_record footer = { pkzip::end_of_central_directory_record_signature };
+    pkzip::end_of_central_directory_record footer;
     footer.total_number_of_entries_in_the_central_directory_on_this_disk
         = static_cast<decltype(footer.total_number_of_entries_in_the_central_directory_on_this_disk)>(records.size());
     footer.total_number_of_entries_in_the_central_directory

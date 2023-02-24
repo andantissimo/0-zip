@@ -36,12 +36,13 @@ try
         "Usage: " + fs::path(argv[0]).stem().string() + " [options] <" + patterns + ">...\n"
         "\n"
         "Options");
+    options opts;
     desc.add_options()
         ("help,h", "print this help")
-        ("quiet,q", "quiet (no output)")
-        ("version,v", "print the version");
-
-    options opts;
+        ("quiet,q", "quiet mode")
+        ("version,v", "print the version")
+        ("charset,O", po::value(&opts.charset)->value_name("CHARSET")->default_value("cp932"),
+            "specify a character encoding");
     vector<string_type> args;
     try {
         auto parsed = po::parse_command_line(argc, argv, desc);
