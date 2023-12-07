@@ -33,7 +33,7 @@ converts and/or extracts data in *.pdf, *.rar or *.zip to a noncompressed zip ar
 
 * Visual Studio 2019+
   * Windows Universal CRT
-* VCpkg
+* vcpkg
   * boost-crc:x64-windows-static
   * boost-interprocess:x64-windows-static
   * boost-iostreams:x64-windows-static

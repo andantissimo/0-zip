@@ -59,7 +59,8 @@ try
         ("quiet,q", "quiet mode")
         ("version,v", "print the version")
         ("charset,O", po::value(&opts.charset)->value_name("IN,OUT")->default_value(opts.charset),
-            "specify character encodings");
+            "specify character encodings")
+        ("rename,n", "rename entries to sequential numbers");
     vector<string_type> args;
     try {
         auto parsed = po::parse_command_line(argc, argv, desc);
@@ -77,6 +78,8 @@ try
         }
         if (vmap.count("quiet"))
             opts.quiet = true;
+        if (vmap.count("rename"))
+            opts.rename = true;
     } catch (...) {
         cerr << desc << endl;
         exit(2);

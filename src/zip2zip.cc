@@ -40,6 +40,13 @@ static inline auto & copy_n(io::ifstream &source, size_type count, io::ofstream 
     return dest;
 }
 
+static inline auto make_file_name(size_t entry_num, basic_string_view<pkzip::char_type> extension)
+{
+    basic_ostringstream<pkzip::char_type> ss;
+    ss << setw(3) << setfill<pkzip::char_type>('0') << entry_num << extension;
+    return ss.str();
+}
+
 void zz::zip2zip(const fs::path &path, const options &opts)
 {
     const auto filename = path.filename();
@@ -81,6 +88,17 @@ void zz::zip2zip(const fs::path &path, const options &opts)
     sort(begin(entries), end(entries), [](const auto &lhs, const auto &rhs) {
         return strnatcasecmp(lhs.header.file_name, rhs.header.file_name) < 0;
     });
+
+    if (opts.rename) {
+        for (size_t i = 0, n = entries.size(); i < n; i++) {
+            auto &header = entries.at(i).header;
+            auto pos = header.file_name.find_last_of('.');
+            auto ext = pos == string::npos
+                ? basic_string_view<pkzip::char_type>{}
+                : basic_string_view<pkzip::char_type>(header.file_name).substr(pos);
+            header.file_name = make_file_name(1 + i, ext);
+        }
+    }
 
     const auto tmp_path = path.parent_path() / path.filename().replace_extension(".tmp");
     io::ofstream tmp;
