@@ -50,7 +50,7 @@ converts and/or extracts data in *.pdf, *.rar or *.zip to a noncompressed zip ar
 ### POSIX Requirements
 
 * CMake 3.8+
-* Clang 6.0+ or GCC 7.0+ or Xcode 11.1+
+* Clang 10+ or GCC 10+ or Xcode 13+
 * Boost 1.66+
   * boost-iostreams
   * boost-locale

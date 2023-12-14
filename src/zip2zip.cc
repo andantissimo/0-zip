@@ -62,7 +62,7 @@ void zz::zip2zip(const fs::path &path, const options &opts)
         streamoff                offset;
     };
     vector<entry_t> entries;
-    for (pkzip::local_file_header header(opts.charset.first); zip >> header && header; zip.seekg(entries.back().offset + header.compressed_size)) {
+    for (pkzip::local_file_header header(opts.charsets.first); zip >> header && header; zip.seekg(entries.back().offset + header.compressed_size)) {
         if (header.general_purpose_bit_flag & pkzip::general_purpose_bit_flags::file_is_encrypted)
             throw runtime_error("encryption not supported: " + filename);
         if (header.general_purpose_bit_flag & pkzip::general_purpose_bit_flags::has_data_descriptor)
@@ -70,7 +70,7 @@ void zz::zip2zip(const fs::path &path, const options &opts)
         const streamoff offset = zip.tellg();
         if (static_cast<decltype(filesize)>(offset + header.compressed_size) > filesize)
             break;
-        header.charset = opts.charset.second;
+        header.charset = opts.charsets.second;
         entries.push_back(entry_t{ header, offset });
         using total_number_of_entries_type
             = decltype(pkzip::end_of_central_directory_record::total_number_of_entries_in_the_central_directory);
@@ -85,6 +85,11 @@ void zz::zip2zip(const fs::path &path, const options &opts)
 
     zip.clear();
 
+    entries.erase(remove_if(begin(entries), end(entries), [&opts](entry_t &e) {
+        return any_of(begin(opts.excludes), end(opts.excludes), [&e](basic_string_view<pkzip::char_type> x) {
+            return x.starts_with('*') ? e.header.file_name.ends_with(x.substr(1)) : e.header.file_name == x;
+        });
+    }), end(entries));
     sort(begin(entries), end(entries), [](const auto &lhs, const auto &rhs) {
         return strnatcasecmp(lhs.header.file_name, rhs.header.file_name) < 0;
     });
@@ -113,7 +118,7 @@ void zz::zip2zip(const fs::path &path, const options &opts)
         if (offset > numeric_limits<decltype(pkzip::central_file_header::relative_offset_of_local_header)>::max())
             throw runtime_error("large file not supported: " + filename);
 
-        pkzip::central_file_header record(opts.charset.second);
+        pkzip::central_file_header record(opts.charsets.second);
         record.version_made_by                 = entry.header.version_needed_to_extract | pkzip::version_made_by::msdos;
         record.version_needed_to_extract       = entry.header.version_needed_to_extract;
         record.general_purpose_bit_flag        = entry.header.general_purpose_bit_flag;

@@ -55,12 +55,14 @@ try
         "Options");
     options opts;
     desc.add_options()
-        ("help,h", "print this help")
-        ("quiet,q", "quiet mode")
+        ("help,h"   , "print this help")
+        ("quiet,q"  , "quiet mode")
         ("version,v", "print the version")
-        ("charset,O", po::value(&opts.charset)->value_name("IN,OUT")->default_value(opts.charset),
-            "specify character encodings")
-        ("rename,n", "rename entries to sequential numbers");
+        ("charset,O", po::value(&opts.charsets)->value_name("IN,OUT")->default_value(opts.charsets),
+                      "specify character encodings")
+        ("exclude,x", po::value(&opts.excludes)->value_name("PATTERN"),
+                      "exclude files with the given patterns")
+        ("rename,n" , "rename entries to sequential numbers");
     vector<string_type> args;
     try {
         auto parsed = po::parse_command_line(argc, argv, desc);

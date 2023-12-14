@@ -221,7 +221,7 @@ void zz::rar2zip(const fs::path &path, const options &opts)
         if (rarHeaderData.UnpSizeHigh != 0)
             throw runtime_error("large file not supported: " + filename);
 
-        pkzip::local_file_header header(opts.charset.second);
+        pkzip::local_file_header header(opts.charsets.second);
         header.compressed_size   = rarHeaderData.UnpSize;
         header.uncompressed_size = rarHeaderData.UnpSize;
 #ifdef _UNICODE
@@ -230,6 +230,9 @@ void zz::rar2zip(const fs::path &path, const options &opts)
         header.file_name         = rarHeaderData.FileName;
 #endif
         replace(begin(header.file_name), end(header.file_name), '\\', '/');
+        if (any_of(begin(opts.excludes), end(opts.excludes), [&header](basic_string_view<pkzip::char_type> x)
+                   { return x.starts_with('*') ? header.file_name.ends_with(x.substr(1)) : header.file_name == x; }))
+            continue;
 
         const streamoff offset = zip.tellp();
         if (offset > numeric_limits<decltype(pkzip::central_file_header::relative_offset_of_local_header)>::max())
@@ -270,7 +273,7 @@ void zz::rar2zip(const fs::path &path, const options &opts)
         if (!opts.quiet)
             cout << "\r   " << dec << setw(3) << setfill('0') << records.size() << " entries written";
 
-        pkzip::central_file_header record(opts.charset.second);
+        pkzip::central_file_header record(opts.charsets.second);
         record.version_made_by                 = header.version_needed_to_extract | pkzip::version_made_by::msdos;
         record.version_needed_to_extract       = header.version_needed_to_extract;
         record.crc32                           = header.crc32;

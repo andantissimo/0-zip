@@ -128,7 +128,7 @@ void zz::pdf2zip(const fs::path &path, const options &opts)
             if (stream_view.size() > numeric_limits<decltype(pkzip::local_file_header::compressed_size)>::max())
                 throw runtime_error("large file not supported: " + filename);
 
-            pkzip::local_file_header header(opts.charset.second);
+            pkzip::local_file_header header(opts.charsets.second);
             header.crc32             = compute_crc32(stream_view.data(), stream_view.size());
             header.compressed_size   = static_cast<decltype(header.compressed_size)>(stream_view.size());
             header.uncompressed_size = static_cast<decltype(header.uncompressed_size)>(stream_view.size());
@@ -161,7 +161,7 @@ void zz::pdf2zip(const fs::path &path, const options &opts)
         if (offset > numeric_limits<decltype(pkzip::central_file_header::relative_offset_of_local_header)>::max())
             throw runtime_error("large file not supported: " + filename);
 
-        pkzip::central_file_header record(opts.charset.second);
+        pkzip::central_file_header record(opts.charsets.second);
         record.version_made_by                 = entry.header.version_needed_to_extract | pkzip::version_made_by::msdos;
         record.version_needed_to_extract       = entry.header.version_needed_to_extract;
         record.crc32                           = entry.header.crc32;
