@@ -90,17 +90,13 @@ void zz::pdf2zip(const fs::path &path, const options &opts)
         if (objects.empty())
             throw runtime_error("no object found: " + filename);
 
-        sort(begin(objects), end(objects), [](const object_t &lhs, const object_t &rhs) {
-            return lhs.begin < rhs.begin;
-        });
+        sort(begin(objects), end(objects), [](const auto &lhs, const auto &rhs) { return lhs.begin < rhs.begin; });
         for (size_t i = 1; i < objects.size(); i++)
             objects[i - 1].end = objects[i].begin;
         objects[objects.size() - 1].end = startxref;
     }
 
-    sort(begin(objects), end(objects), [](const object_t &lhs, const object_t &rhs) {
-        return lhs.number < rhs.number;
-    });
+    sort(begin(objects), end(objects), [](const auto &lhs, const auto &rhs) { return lhs.number < rhs.number; });
 
     struct entry_t
     {

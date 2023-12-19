@@ -85,11 +85,12 @@ void zz::zip2zip(const fs::path &path, const options &opts)
 
     zip.clear();
 
-    entries.erase(remove_if(begin(entries), end(entries), [&opts](entry_t &e) {
-        return any_of(begin(opts.excludes), end(opts.excludes), [&e](basic_string_view<pkzip::char_type> x) {
+    for (const basic_string_view<pkzip::char_type> x : opts.excludes) {
+        entries.erase(remove_if(begin(entries), end(entries), [x](const auto &e) {
             return x.starts_with('*') ? e.header.file_name.ends_with(x.substr(1)) : e.header.file_name == x;
-        });
-    }), end(entries));
+        }), end(entries));
+    }
+
     sort(begin(entries), end(entries), [](const auto &lhs, const auto &rhs) {
         return strnatcasecmp(lhs.header.file_name, rhs.header.file_name) < 0;
     });
