@@ -37,6 +37,11 @@ namespace zz::pkzip
         constexpr uint16_t deflated = 8;
     }
 
+    namespace msdos
+    {
+        constexpr uint32_t file_attribute_directory = 0x00000010;
+    }
+
     constexpr uint32_t local_file_header_signature = 'P' | 'K' << 8 | 3 << 16 | 4 << 24;
 
     struct local_file_header

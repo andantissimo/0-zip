@@ -56,9 +56,11 @@ void zz::zip2zip(const fs::path &path, const options &opts)
     zip.exceptions(ios::failbit | ios::badbit);
     zip.open(path, ios::binary);
 
+    using file_attributes_type = decltype(pkzip::central_file_header::external_file_attributes);
     struct entry_t
     {
         pkzip::local_file_header header;
+        file_attributes_type     file_attributes;
         streamoff                offset;
     };
     vector<entry_t> entries;
@@ -71,7 +73,7 @@ void zz::zip2zip(const fs::path &path, const options &opts)
         if (static_cast<decltype(filesize)>(offset + header.compressed_size) > filesize)
             break;
         header.charset = opts.charsets.second;
-        entries.push_back(entry_t{ header, offset });
+        entries.push_back(entry_t{ header, 0, offset });
         using total_number_of_entries_type
             = decltype(pkzip::end_of_central_directory_record::total_number_of_entries_in_the_central_directory);
         if (entries.size() > numeric_limits<total_number_of_entries_type>::max())
@@ -82,6 +84,19 @@ void zz::zip2zip(const fs::path &path, const options &opts)
     }
     if (!opts.quiet)
         cout << endl;
+
+    if (entries.empty())
+        return;
+
+    zip.seekg(entries.back().offset + entries.back().header.compressed_size);
+    for (entry_t &e : entries) {
+        pkzip::central_file_header record(opts.charsets.first);
+        zip >> record;
+        if (!record)
+            break;
+        if ((record.version_made_by & 0xFF00) == pkzip::version_made_by::msdos)
+            e.file_attributes = record.external_file_attributes;
+    }
 
     zip.clear();
 
@@ -96,6 +111,9 @@ void zz::zip2zip(const fs::path &path, const options &opts)
     });
 
     if (opts.rename) {
+        entries.erase(remove_if(begin(entries), end(entries), [](const auto &e) {
+            return (e.file_attributes & pkzip::msdos::file_attribute_directory) != 0;
+        }), end(entries));
         for (size_t i = 0, n = entries.size(); i < n; i++) {
             auto &header = entries.at(i).header;
             auto pos = header.file_name.find_last_of('.');
@@ -129,6 +147,7 @@ void zz::zip2zip(const fs::path &path, const options &opts)
         record.crc32                           = entry.header.crc32;
         record.compressed_size                 = entry.header.compressed_size;
         record.uncompressed_size               = entry.header.uncompressed_size;
+        record.external_file_attributes        = entry.file_attributes;
         record.relative_offset_of_local_header = static_cast<decltype(record.relative_offset_of_local_header)>(offset);
         record.file_name                       = entry.header.file_name;
         record.extra_field                     = entry.header.extra_field;
