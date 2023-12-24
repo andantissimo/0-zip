@@ -49,7 +49,7 @@ void zz::pdf2zip(const fs::path &path, const options &opts)
 {
     const auto filename = path.filename();
 
-    string pdf(fs::file_size(path), '\0');
+    string pdf(static_cast<string::size_type>(fs::file_size(path)), '\0');
     {
         io::ifstream file;
         file.open(path, ios::binary);
