@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="..\src\dir2zip.cc" />
     <ClCompile Include="..\src\main.cc" />
     <ClCompile Include="..\src\pdf2zip.cc" />
     <ClCompile Include="..\src\pkzip_io.cc" />
@@ -12,6 +13,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\config.h" />
+    <ClInclude Include="..\src\dir2zip.h" />
     <ClInclude Include="..\src\dll.h" />
     <ClInclude Include="..\src\handle.h" />
     <ClInclude Include="..\src\options.h" />

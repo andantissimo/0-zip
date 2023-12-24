@@ -207,8 +207,6 @@ void zz::rar2zip(const fs::path &path, const options &opts)
     zip.exceptions(ios::failbit | ios::badbit);
     zip.open(zip_path, ios::binary);
 
-    const auto zip_name = zip_path.filename();
-
     vector<pkzip::central_file_header> records;
     for (;;) {
         RARHeaderDataEx rarHeaderData = {};
@@ -270,9 +268,6 @@ void zz::rar2zip(const fs::path &path, const options &opts)
         zip.seekp(offset) << header;
         zip.seekp(next_offset);
 
-        if (!opts.quiet)
-            cout << "\r   " << dec << setw(3) << setfill('0') << records.size() << " entries written";
-
         pkzip::central_file_header record(opts.charsets.second);
         record.version_made_by                 = header.version_needed_to_extract | pkzip::version_made_by::msdos;
         record.version_needed_to_extract       = header.version_needed_to_extract;
@@ -284,6 +279,9 @@ void zz::rar2zip(const fs::path &path, const options &opts)
         records.push_back(record);
         if (records.size() > numeric_limits<decltype(pkzip::end_of_central_directory_record::total_number_of_entries_in_the_central_directory)>::max())
             throw runtime_error("too many entries: " + filename);
+
+        if (!opts.quiet)
+            cout << "\r   " << dec << setw(3) << setfill('0') << records.size() << " entries written";
     }
     if (!opts.quiet)
         cout << endl;

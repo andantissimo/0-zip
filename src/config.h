@@ -6,12 +6,15 @@ namespace zz
 {
     namespace fs
     {
+        using std::filesystem::directory_iterator;
         using std::filesystem::filesystem_error;
         using std::filesystem::path;
         using std::filesystem::absolute;
         using std::filesystem::exists;
         using std::filesystem::file_size;
+        using std::filesystem::is_directory;
         using std::filesystem::last_write_time;
+        using std::filesystem::relative;
         using std::filesystem::rename;
     }
     namespace io
@@ -31,12 +34,15 @@ namespace zz
 {
     namespace fs
     {
+        using std::experimental::filesystem::directory_iterator;
         using std::experimental::filesystem::filesystem_error;
         using std::experimental::filesystem::path;
         using std::experimental::filesystem::absolute;
         using std::experimental::filesystem::exists;
         using std::experimental::filesystem::file_size;
+        using std::experimental::filesystem::is_directory;
         using std::experimental::filesystem::last_write_time;
+        using std::experimental::filesystem::relative;
         using std::experimental::filesystem::rename;
     }
     namespace io
@@ -56,12 +62,15 @@ namespace zz
 {
     namespace fs
     {
+        using boost::filesystem::directory_iterator;
         using boost::filesystem::filesystem_error;
         using boost::filesystem::path;
         using boost::filesystem::absolute;
         using boost::filesystem::exists;
         using boost::filesystem::file_size;
+        using boost::filesystem::is_directory;
         using boost::filesystem::last_write_time;
+        using boost::filesystem::relative;
         using boost::filesystem::rename;
     }
     namespace io

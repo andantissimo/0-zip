@@ -9,6 +9,7 @@
 
 #include "options.h"
 #include "version.h"
+#include "dir2zip.h"
 #include "pdf2zip.h"
 #include "rar2zip.h"
 #include "zip2zip.h"
@@ -53,8 +54,8 @@ try
     using string_type = basic_string<char_type>;
 
     const auto patterns = zz::rar_exists()
-        ? "*.pdf|*.rar|*.zip"
-        : "*.pdf|*.zip";
+        ? "directory|*.pdf|*.rar|*.zip"
+        : "directory|*.pdf|*.zip";
     po::options_description desc(
         "Usage: " + fs::path(argv[0]).stem().string() + " [options] <" + patterns + ">...\n"
         "\n"
@@ -102,6 +103,10 @@ try
         if (!opts.quiet)
             cout << (1 + i) << ". " << path.filename() << endl;
 
+        if (fs::is_directory(path)) {
+            dir2zip(path, opts);
+            continue;
+        }
         uint32_t signature = 0;
         {
             io::ifstream file;
