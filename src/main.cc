@@ -13,6 +13,12 @@
 #include "rar2zip.h"
 #include "zip2zip.h"
 
+#ifdef _UNICODE
+#define tvalue wvalue
+#else
+#define tvalue value
+#endif
+
 using namespace zz;
 using namespace std;
 namespace po = boost::program_options;
@@ -60,7 +66,7 @@ try
         ("version,v", "print the version")
         ("charset,O", po::value(&opts.charsets)->value_name("IN,OUT")->default_value(opts.charsets),
                       "specify character encodings")
-        ("exclude,x", po::value(&opts.excludes)->value_name("PATTERN"),
+        ("exclude,x", po::tvalue(&opts.excludes)->value_name("PATTERN"),
                       "exclude files with the given patterns")
         ("rename,n" , "rename entries to sequential numbers");
     vector<string_type> args;
