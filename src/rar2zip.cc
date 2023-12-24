@@ -17,6 +17,7 @@
 #include "dll.h"
 #include "path_ops.h"
 #include "pkzip_io.h"
+#include "strnatcmp.h"
 
 #include "rar2zip.h"
 
@@ -220,12 +221,17 @@ void zz::rar2zip(const fs::path &path, const options &opts)
             throw runtime_error("large file not supported: " + filename);
 
         pkzip::local_file_header header(opts.charsets.second);
-        header.compressed_size   = rarHeaderData.UnpSize;
-        header.uncompressed_size = rarHeaderData.UnpSize;
+        header.general_purpose_bit_flag = strnatcasecmp(header.charset, "utf8"s) == 0
+                                        ? pkzip::general_purpose_bit_flags::use_utf8
+                                        : 0;
+        header.last_mod_file_time       = static_cast<uint16_t>(rarHeaderData.FileTime >>  0 & 0xFFFF);
+        header.last_mod_file_date       = static_cast<uint16_t>(rarHeaderData.FileTime >> 16 & 0xFFFF);
+        header.compressed_size          = rarHeaderData.UnpSize;
+        header.uncompressed_size        = rarHeaderData.UnpSize;
 #ifdef _UNICODE
-        header.file_name         = rarHeaderData.FileNameW;
+        header.file_name                = rarHeaderData.FileNameW;
 #else
-        header.file_name         = rarHeaderData.FileName;
+        header.file_name                = rarHeaderData.FileName;
 #endif
         replace(begin(header.file_name), end(header.file_name), '\\', '/');
         if (any_of(begin(opts.excludes), end(opts.excludes), [&header](basic_string_view<pkzip::char_type> x)
@@ -271,6 +277,9 @@ void zz::rar2zip(const fs::path &path, const options &opts)
         pkzip::central_file_header record(opts.charsets.second);
         record.version_made_by                 = header.version_needed_to_extract | pkzip::version_made_by::msdos;
         record.version_needed_to_extract       = header.version_needed_to_extract;
+        record.general_purpose_bit_flag        = header.general_purpose_bit_flag;
+        record.last_mod_file_time              = header.last_mod_file_time;
+        record.last_mod_file_date              = header.last_mod_file_date;
         record.crc32                           = header.crc32;
         record.compressed_size                 = header.compressed_size;
         record.uncompressed_size               = header.uncompressed_size;

@@ -165,6 +165,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\dir2zip.cc" />
+    <ClCompile Include="..\src\dostime.cc" />
     <ClCompile Include="..\src\main.cc" />
     <ClCompile Include="..\src\pdf2zip.cc" />
     <ClCompile Include="..\src\pkzip_io.cc" />
@@ -176,6 +177,7 @@
     <ClInclude Include="..\src\config.h" />
     <ClInclude Include="..\src\dir2zip.h" />
     <ClInclude Include="..\src\dll.h" />
+    <ClInclude Include="..\src\dostime.h" />
     <ClInclude Include="..\src\handle.h" />
     <ClInclude Include="..\src\options.h" />
     <ClInclude Include="..\src\path_ops.h" />

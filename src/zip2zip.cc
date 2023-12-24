@@ -73,6 +73,10 @@ void zz::zip2zip(const fs::path &path, const options &opts)
         if (static_cast<decltype(filesize)>(offset + header.compressed_size) > filesize)
             break;
         header.charset = opts.charsets.second;
+        if (strnatcasecmp(header.charset, "utf8"s) == 0)
+            header.general_purpose_bit_flag |=  pkzip::general_purpose_bit_flags::use_utf8;
+        else
+            header.general_purpose_bit_flag &= ~pkzip::general_purpose_bit_flags::use_utf8;
         entries.push_back(entry_t{ header, 0, offset });
         using total_number_of_entries_type
             = decltype(pkzip::end_of_central_directory_record::total_number_of_entries_in_the_central_directory);

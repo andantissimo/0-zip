@@ -16,8 +16,10 @@
 #pragma warning(pop)
 #endif
 
+#include "dostime.h"
 #include "path_ops.h"
 #include "pkzip_io.h"
+#include "strnatcmp.h"
 
 #include "pdf2zip.h"
 
@@ -48,6 +50,7 @@ static inline auto make_file_name(size_t object_num, const char *extension)
 void zz::pdf2zip(const fs::path &path, const options &opts)
 {
     const auto filename = path.filename();
+    const auto mtime = fs::last_write_time(path);
 
     string pdf(static_cast<string::size_type>(fs::file_size(path)), '\0');
     {
@@ -125,10 +128,14 @@ void zz::pdf2zip(const fs::path &path, const options &opts)
                 throw runtime_error("large file not supported: " + filename);
 
             pkzip::local_file_header header(opts.charsets.second);
-            header.crc32             = compute_crc32(stream_view.data(), stream_view.size());
-            header.compressed_size   = static_cast<decltype(header.compressed_size)>(stream_view.size());
-            header.uncompressed_size = static_cast<decltype(header.uncompressed_size)>(stream_view.size());
-            header.file_name         = make_file_name(1 + entries.size(), ".jpg");
+            header.general_purpose_bit_flag = strnatcasecmp(header.charset, "utf8"s) == 0
+                                            ? pkzip::general_purpose_bit_flags::use_utf8
+                                            : 0;
+            header.crc32                    = compute_crc32(stream_view.data(), stream_view.size());
+            header.compressed_size          = static_cast<decltype(header.compressed_size)>(stream_view.size());
+            header.uncompressed_size        = static_cast<decltype(header.uncompressed_size)>(stream_view.size());
+            header.file_name                = make_file_name(1 + entries.size(), ".jpg");
+            tie(header.last_mod_file_date, header.last_mod_file_time) = to_dos_date_time(mtime);
             entries.push_back({ header, stream_view });
 
             if (!opts.quiet)
@@ -160,6 +167,9 @@ void zz::pdf2zip(const fs::path &path, const options &opts)
         pkzip::central_file_header record(opts.charsets.second);
         record.version_made_by                 = entry.header.version_needed_to_extract | pkzip::version_made_by::msdos;
         record.version_needed_to_extract       = entry.header.version_needed_to_extract;
+        record.general_purpose_bit_flag        = entry.header.general_purpose_bit_flag;
+        record.last_mod_file_time              = entry.header.last_mod_file_time;
+        record.last_mod_file_date              = entry.header.last_mod_file_date;
         record.crc32                           = entry.header.crc32;
         record.compressed_size                 = entry.header.compressed_size;
         record.uncompressed_size               = entry.header.uncompressed_size;
@@ -204,5 +214,5 @@ void zz::pdf2zip(const fs::path &path, const options &opts)
 
     zip.close();
 
-    fs::last_write_time(zip_path, fs::last_write_time(path));
+    fs::last_write_time(zip_path, mtime);
 }

@@ -14,6 +14,7 @@
 #pragma warning(pop)
 #endif
 
+#include "dostime.h"
 #include "path_ops.h"
 #include "pkzip_io.h"
 #include "strnatcmp.h"
@@ -56,15 +57,20 @@ void zz::dir2zip(const fs::path &path, const options &opts)
         const auto size = fs::file_size(file);
         if (size > std::numeric_limits<decltype(pkzip::local_file_header::compressed_size)>::max())
             throw runtime_error("large file not supported: " + dirname);
+        const auto mtime = fs::last_write_time(file);
 
         pkzip::local_file_header header(opts.charsets.second);
-        header.compressed_size   = static_cast<decltype(header.compressed_size)>(size);
-        header.uncompressed_size = static_cast<decltype(header.uncompressed_size)>(size);
-        header.file_name         = fs::relative(file, path).string();
+        header.general_purpose_bit_flag = strnatcasecmp(header.charset, "utf8"s) == 0
+                                        ? pkzip::general_purpose_bit_flags::use_utf8
+                                        : 0;
+        header.compressed_size          = static_cast<decltype(header.compressed_size)>(size);
+        header.uncompressed_size        = static_cast<decltype(header.uncompressed_size)>(size);
+        header.file_name                = fs::relative(file, path).string();
         replace(begin(header.file_name), end(header.file_name), '\\', '/');
         if (any_of(begin(opts.excludes), end(opts.excludes), [&header](basic_string_view<pkzip::char_type> x)
                    { return x.starts_with('*') ? header.file_name.ends_with(x.substr(1)) : header.file_name == x; }))
             continue;
+        tie(header.last_mod_file_date, header.last_mod_file_time) = to_dos_date_time(mtime);
 
         const streamoff offset = zip.tellp();
         if (offset > numeric_limits<decltype(pkzip::central_file_header::relative_offset_of_local_header)>::max())
@@ -88,6 +94,9 @@ void zz::dir2zip(const fs::path &path, const options &opts)
         pkzip::central_file_header record(opts.charsets.second);
         record.version_made_by                 = header.version_needed_to_extract | pkzip::version_made_by::msdos;
         record.version_needed_to_extract       = header.version_needed_to_extract;
+        record.general_purpose_bit_flag        = header.general_purpose_bit_flag;
+        record.last_mod_file_time              = header.last_mod_file_time;
+        record.last_mod_file_date              = header.last_mod_file_date;
         record.crc32                           = header.crc32;
         record.compressed_size                 = header.compressed_size;
         record.uncompressed_size               = header.uncompressed_size;
