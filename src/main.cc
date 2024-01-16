@@ -95,9 +95,9 @@ try
     }
 
     for (auto it = begin(args); it != end(args); ++it) {
-        auto path = fs::path(*it);
+        auto path = fs::path(it->ends_with('/') ? it->substr(0, it->size() - 1) : *it);
         if (!fs::exists(path))
-            throw runtime_error("file not found: " + path.filename());
+            throw runtime_error("file or directory not found: " + path.filename());
 
         auto i = distance(begin(args), it);
         if (!opts.quiet)

@@ -136,7 +136,7 @@ inline int strnatcasecmp(iterator_type lbegin, iterator_type lend, iterator_type
 template <typename char_type>
 inline int strnatcmp(const std::basic_string<char_type> &lhs, const std::basic_string<char_type> &rhs) noexcept
 {
-    return strnapcmp(std::begin(lhs), std::end(lhs), std::begin(rhs), std::end(rhs));
+    return strnatcmp(std::begin(lhs), std::end(lhs), std::begin(rhs), std::end(rhs));
 }
 
 template <typename char_type>

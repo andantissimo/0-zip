@@ -64,7 +64,7 @@ bool zz::fs::trash(const zz::fs::path &path, zz::ec::error_code &ec) noexcept
         return false;
     }
 
-    auto backup_filename = path.filename().string() + "~";
+    auto backup_filename = path.filename().native() + "~";
     rename(path, path.parent_path() / backup_filename, ec);
     return !ec;
 }

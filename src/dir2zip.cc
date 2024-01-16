@@ -27,7 +27,7 @@ using namespace std;
 using crc32_t = boost::crc_32_type;
 
 template <typename output_iterator_type>
-void enumerate_files(const fs::path &path, output_iterator_type files)
+static void enumerate_files(const fs::path &path, output_iterator_type files)
 {
     for (const auto &entry : fs::directory_iterator(path)) {
         if (entry.is_directory())
@@ -49,7 +49,7 @@ void zz::dir2zip(const fs::path &path, const options &opts)
     vector<fs::path> files;
     enumerate_files(path, back_inserter(files));
     sort(begin(files), end(files), [](const fs::path &lhs, const fs::path &rhs) {
-        return strnatcasecmp(lhs.string(), rhs.string()) < 0;
+        return strnatcasecmp(lhs.native(), rhs.native()) < 0;
     });
 
     vector<pkzip::central_file_header> records;
@@ -65,7 +65,7 @@ void zz::dir2zip(const fs::path &path, const options &opts)
                                         : 0;
         header.compressed_size          = static_cast<decltype(header.compressed_size)>(size);
         header.uncompressed_size        = static_cast<decltype(header.uncompressed_size)>(size);
-        header.file_name                = fs::relative(file, path).string();
+        header.file_name                = fs::relative(file, path);
         replace(begin(header.file_name), end(header.file_name), '\\', '/');
         if (any_of(begin(opts.excludes), end(opts.excludes), [&header](basic_string_view<pkzip::char_type> x)
                    { return x.starts_with('*') ? header.file_name.ends_with(x.substr(1)) : header.file_name == x; }))
@@ -79,8 +79,8 @@ void zz::dir2zip(const fs::path &path, const options &opts)
 
         crc32_t crc32;
         {
-            ifstream is(file);
-            for (char buf[8192]; auto n = is.readsome(buf, sizeof buf); ) {
+            ifstream is(file, ios::binary);
+            for (char buf[8192]; auto n = is.read(buf, sizeof buf).gcount(); ) {
                 zip.write(buf, n);
                 crc32.process_bytes(buf, static_cast<size_t>(n));
             }
