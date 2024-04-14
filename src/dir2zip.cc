@@ -41,7 +41,7 @@ void zz::dir2zip(const fs::path &path, const options &opts)
 {
     const auto dirname = path.filename();
 
-    const auto zip_path = path.parent_path() / path.filename().replace_extension(".zip");
+    const auto zip_path = path.parent_path() / (path.filename() + ".zip");
     io::ofstream zip;
     zip.exceptions(ios::failbit | ios::badbit);
     zip.open(zip_path, ios::binary);
