@@ -26,8 +26,17 @@ tuple<uint16_t, uint16_t> to_dos_date_time(const time_point<file_clock> &mtime)
     const auto h = floor<hours>(t - d);
     const auto m = floor<minutes>(t - d - h);
     const auto s = floor<seconds>(t - d - h - m);
-#else
+#elif __apple_build_version__
     const auto t = file_clock::to_time_t(mtime);
+    const auto u = duration_cast<system_clock::duration>(mtime.time_since_epoch())
+                 + seconds(localtime(&t)->tm_gmtoff);
+    const auto d = floor<days>(u);
+    const auto y = year_month_day(sys_days(d));
+    const auto h = floor<hours>(u - d);
+    const auto m = floor<minutes>(u - d - h);
+    const auto s = floor<seconds>(u - d - h - m);
+#else
+    const auto t = system_clock::to_time_t(time_point_cast<system_clock::duration>(file_clock::to_sys(mtime)));
     const auto u = duration_cast<system_clock::duration>(mtime.time_since_epoch())
                  + seconds(localtime(&t)->tm_gmtoff);
     const auto d = floor<days>(u);
