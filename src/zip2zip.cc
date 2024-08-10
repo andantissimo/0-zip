@@ -2,9 +2,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <sstream>
 #include <stdexcept>
-
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -16,6 +14,7 @@
 #pragma warning(pop)
 #endif
 
+#include "filename.h"
 #include "path_ops.h"
 #include "pkzip_io.h"
 #include "strnatcmp.h"
@@ -38,13 +37,6 @@ static inline auto & copy_n(io::ifstream &source, size_type count, io::ofstream 
     for (streamsize read; (read = source.read(buffer, min(buffer_size, count)).gcount()) > 0; count -= static_cast<size_type>(read))
         dest.write(buffer, read);
     return dest;
-}
-
-static inline auto make_file_name(size_t entry_num, basic_string_view<pkzip::char_type> extension)
-{
-    basic_ostringstream<pkzip::char_type> ss;
-    ss << setw(3) << setfill<pkzip::char_type>('0') << entry_num << extension;
-    return ss.str();
 }
 
 void zz::zip2zip(const fs::path &path, const options &opts)
@@ -124,7 +116,7 @@ void zz::zip2zip(const fs::path &path, const options &opts)
             auto ext = pos == string::npos
                 ? basic_string_view<pkzip::char_type>{}
                 : basic_string_view<pkzip::char_type>(header.file_name).substr(pos);
-            header.file_name = make_file_name(1 + i, ext);
+            header.file_name = make_filename(1 + i, ext);
         }
     }
 
